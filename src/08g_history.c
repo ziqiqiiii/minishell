@@ -37,18 +37,13 @@ t_history	*history_node_new(int index, void *cmd)
 }
 
 /**
- * history_clear - Frees the memory used by a doubly-linked list of history 
-					  nodes,
- *                 and sets the list head pointer to NULL. It also clears 
-					  the 
- *                 history maintained by the readline library. This function 
- *                 should be called when the shell is exiting or when history
-					  is no longer needed.
- * @param history: A pointer to the head of the doubly-linked list of 
-				      history nodes.
+ * @brief Frees all nodes in the history list and clears readline history.
  *
- * @returns 
- * Void. Does not return any value and does not modify any global variables.
+ * This function walks the doubly-linked list, freeing each node and its
+ * command string, then resets the head pointer to NULL and calls
+ * clear_history() to flush the readline library's internal history.
+ *
+ * @param history Pointer to the head of the doubly-linked history list.
  */
 void	history_clear(t_history **history)
 {
@@ -70,20 +65,14 @@ void	history_clear(t_history **history)
 }
 
 /**
- * history_add - Adds a new history node to a doubly-linked list of 
-					history nodes. It first checks if the provided command 
-					is not NULL. If the command is valid, it increments the 
-					index, then creates a new history node using the updated
-					index and the command. It then appends the new node 
-                 to the end of the list, correctly adjusting 'next' and 
-					'prev' pointers.
+ * @brief Appends a new command entry to the history list.
  *
- * @param history: A pointer to the head of the doubly-linked list of 
-					history nodes.
- * @param cmd: The command for the new history node.
+ * If cmd is NULL the function returns immediately. Otherwise it increments
+ * the internal index, creates a new node, and links it to the tail of the
+ * list, updating the prev pointer of the new node accordingly.
  *
- * @returns 
- * Void. Does not return any value and does not modify any global variables.
+ * @param history Pointer to the head of the doubly-linked history list.
+ * @param cmd The command string to record.
  */
 void	history_add(t_history **history, char *cmd)
 {

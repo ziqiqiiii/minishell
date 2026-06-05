@@ -17,14 +17,13 @@ static void	signal_handler2(int signum);
 static void	heredoc_signal(int signum);
 
 /**
- * signals - Set up signal handlers based on the given mode.
- * @param sh: A pointer to a structure representing the shell (unused in this
- 				implementation).
- * @param mode: An integer representing the mode for setting up signal handlers.
- *              Mode 1: Set signal_handler for SIGINT and SIGQUIT signals.
- *              Mode 0: Set signal_handler2 for SIGINT and SIGQUIT signals.
- *              Mode 2: Set heredoc_signal for SIGINT and ignore SIGQUIT signal.
- * @return: void
+ * @brief Configures signal handlers based on the current shell mode.
+ *
+ * Mode 1: prompt mode — SIGINT reprints the prompt, SIGQUIT is ignored.
+ * Mode 0: execution mode — SIGINT and SIGQUIT pass through to the child.
+ * Mode 2: heredoc mode — SIGINT exits the heredoc child, SIGQUIT is ignored.
+ *
+ * @param mode Integer selecting the signal-handler set to install.
  */
 void	signals(int mode)
 {
@@ -47,10 +46,12 @@ void	signals(int mode)
 }
 
 /**
- * signal_handler - Handle signals for SIGINT and SIGQUIT during 
- 					normal shell operation.
- * @param signum: The signal number.
- * @return: void
+ * @brief Handles SIGINT and SIGQUIT during normal prompt operation.
+ *
+ * On SIGINT, prints a newline and redraws the prompt. On SIGQUIT,
+ * simply redraws the prompt without any output.
+ *
+ * @param signum The signal number received.
  */
 static void	signal_handler(int signum)
 {
@@ -71,10 +72,12 @@ static void	signal_handler(int signum)
 }
 
 /**
- * signal_handler2 - Handle signals for SIGINT and SIGQUIT in a specific 
- 					 mode (mode 0).
- * @param signum: The signal number.
- * @return: void
+ * @brief Handles SIGINT and SIGQUIT during command execution (mode 0).
+ *
+ * On SIGINT, writes a newline. On SIGQUIT, writes "Quit: 3" to mimic
+ * standard shell behaviour when a child is terminated by SIGQUIT.
+ *
+ * @param signum The signal number received.
  */
 static void	signal_handler2(int signum)
 {
@@ -90,10 +93,12 @@ static void	signal_handler2(int signum)
 }
 
 /**
- * heredoc_signal - Handle the SIGINT signal during "heredoc"
- 					 mode (mode 2).
- * @param signum: The signal number.
- * @return: void
+ * @brief Handles SIGINT during heredoc input (mode 2).
+ *
+ * Immediately exits the heredoc child process so the parent can
+ * detect cancellation via the child's exit status.
+ *
+ * @param signum The signal number received.
  */
 static void	heredoc_signal(int signum)
 {

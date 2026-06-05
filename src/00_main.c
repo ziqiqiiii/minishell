@@ -44,9 +44,15 @@ int	main(int argc, char **argv, char **envp)
 }
 
 /**
- * @brief Prints the banner.
+ * @brief Initializes the shell root structure.
  *
- * This function prints the banner to the standard output.
+ * This function sets up the shell's initial state, including duplicating
+ * stdin/stdout, building the environment linked list, allocating the pipe
+ * array, and configuring terminal attributes to suppress ECHOCTL.
+ *
+ * @param sh Pointer to the shell root structure to initialize.
+ * @param envp Environment variables passed from the OS.
+ * @return EXIT_SUCCESS if successful, or EXIT_FAILURE if an error occurs.
  */
 static int	init_root(t_root *sh, char **envp)
 {

@@ -13,9 +13,12 @@
 #include "minishell.h"
 
 /**
- * del_data - Frees the memory associated with a t_env struct.
+ * @brief Frees the memory associated with a t_env node.
  *
- * @param content  Pointer to the t_env struct to be freed.
+ * Casts the generic content pointer to t_env, then frees the key,
+ * value, and the struct itself.
+ *
+ * @param content Pointer to the t_env struct to be freed.
  */
 void	del_data(void	*content)
 {

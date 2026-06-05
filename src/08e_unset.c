@@ -15,10 +15,14 @@
 static void	unset_helper(char **key, t_list **env_list);
 
 /**
- * unset - Removes an environment variable from the linked list.
+ * @brief Removes one or more environment variables from the linked list.
  *
- * @param env_list  Double pointer to the linked list of environment variables.
- * @param key       The key of the environment variable to be removed.
+ * This function iterates over the provided key array and removes each
+ * matching environment variable from the linked list.
+ *
+ * @param key Array of variable names to remove.
+ * @param env_list Double pointer to the linked list of environment variables.
+ * @return EXIT_SUCCESS upon completion.
  */
 int	unset(char **key, t_list **env_list)
 {

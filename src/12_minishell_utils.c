@@ -13,16 +13,13 @@
 #include "minishell.h"
 
 /**
- * ft_pipe - Creates a pipe between two file descriptors. If the pipe cannot
- *           be created, it outputs an error message and terminates the
- *           process with an exit status of 1.
+ * @brief Creates a pipe, exiting on failure.
  *
- * @param p: A two-element array to hold the file descriptors for the input
- *           and output ends of the pipe.
+ * Calls pipe(2) and terminates the process with an error message if
+ * the system call fails.
  *
- * @returns
- * The file descriptor for the input end of the pipe, or terminates the
- * process if the pipe could not be created.
+ * @param p Two-element array to receive the read and write file descriptors.
+ * @return The read end file descriptor, or exits on failure.
  */
 int	ft_pipe(int p[2])
 {
@@ -36,17 +33,15 @@ int	ft_pipe(int p[2])
 }
 
 /**
- * ft_open - Opens a file with the given flags and permissions. If the file
- *           cannot be opened, it outputs an error message and terminates the
- *           process with an exit status of 1.
+ * @brief Opens a file, exiting on failure.
  *
- * @param file: The name of the file to be opened.
- * @param flags: The flags to use when opening the file.
- * @param permission: The permissions to use when opening the file.
+ * Calls open(2) with the given flags and permission bits. Terminates the
+ * process with an error message if the file cannot be opened.
  *
- * @returns
- * The file descriptor for the opened file, or terminates the process if
- * the file could not be opened.
+ * @param file Path to the file to open.
+ * @param flags Open flags (e.g. O_RDONLY, O_CREAT).
+ * @param permission Permission bits applied when creating a new file.
+ * @return The file descriptor, or exits on failure.
  */
 int	ft_open(const char *file, int flags, int permission)
 {
@@ -63,13 +58,13 @@ int	ft_open(const char *file, int flags, int permission)
 }
 
 /**
- * ft_fork - Forks a new child process. If the fork cannot be completed,
- *           it outputs an error message and terminates the process
- *           with an exit status of 1.
+ * @brief Forks a child process, exiting on failure.
  *
- * @returns
- * The PID of the child process, or terminates the process if the
- * fork could not be completed.
+ * Calls fork(2) and terminates the process with an error message if
+ * the system call fails.
+ *
+ * @return The PID of the child process in the parent (0 in the child),
+ *         or exits on failure.
  */
 int	ft_fork(void)
 {
@@ -86,15 +81,13 @@ int	ft_fork(void)
 }
 
 /**
- * ft_close - Closes a file descriptor. If the file descriptor cannot be
- * 			  closed, it outputs an error message and terminates the
- * 			  process with an exit status of 1.
+ * @brief Closes a file descriptor, exiting on failure.
  *
- * @param fd: The file descriptor to close.
+ * Calls close(2) and terminates the process with an error message if
+ * the system call fails.
  *
- * @returns
- * 0 on successful closure, or terminates the process if the closure could
- * not be completed.
+ * @param fd The file descriptor to close.
+ * @return 0 on success, or exits on failure.
  */
 int	ft_close(int fd)
 {
@@ -108,17 +101,14 @@ int	ft_close(int fd)
 }
 
 /**
- * ft_dup2 - Duplicates a file descriptor, replacing an old file descriptor
- * 			 with a new one. If the file descriptor cannot be duplicated,
- * 			 it outputs an error message and terminates the process with
- * 			 an exit status of 1.
+ * @brief Duplicates a file descriptor, exiting on failure.
  *
- * @param new_fd: The new file descriptor.
- * @param old_fd: The old file descriptor to be replaced.
+ * Calls dup2(2) to make old_fd refer to the same file as new_fd.
+ * Terminates the process with an error message if the call fails.
  *
- * @returns
- * The new file descriptor on successful duplication, or terminates the process
- * if the duplication could not be completed.
+ * @param new_fd The source file descriptor to duplicate.
+ * @param old_fd The target file descriptor to replace.
+ * @return The value of old_fd on success, or exits on failure.
  */
 int	ft_dup2(int new_fd, int old_fd)
 {
