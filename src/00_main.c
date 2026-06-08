@@ -114,7 +114,6 @@ static void	print_banner(void)
 	printf("\n");
 	printf("\033[1;32m");
 	printf("          Welcome to MiniShell!\n");
-	printf("\033[3m        Developed by Dylan & Ziqi\033[0m\n");
 	printf("\033[0m");
 	printf("\n");
 }
