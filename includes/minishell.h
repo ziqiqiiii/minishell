@@ -119,6 +119,12 @@ typedef struct s_usage
     const char  *detail;
 }   t_usage;
 
+typedef struct s_help
+{
+    const char  *name;
+    const char  *desc;
+}   t_help;
+
 typedef struct s_root
 {
 	t_history		*history;
@@ -207,6 +213,7 @@ int			exit_status(int status);
 int			exit_command(char **cmd, t_root *sh);
 void		exit_prompt(t_root *sh);
 int			usage(char **cmd);
+int			help(void);
 
 /* 09_QUOTE */
 
