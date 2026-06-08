@@ -31,6 +31,8 @@ int	builtin(char **cmd, t_root *sh)
 		g_exit_status = history_print(sh->history);
 	else if (ft_strncmp(cmd[0], "exit", ft_strlen("exit") + 1) == 0)
 		g_exit_status = exit_command(cmd, sh);
+	else if (ft_strncmp(cmd[0], "usage", ft_strlen("usage") + 1) == 0)
+		g_exit_status = usage(cmd);
 	else
 		return (0);
 	free_2d(cmd);

@@ -113,6 +113,12 @@ typedef struct s_expand_var
 	int		len;
 }	t_expand_var;
 
+typedef struct s_usage
+{
+    const char  *name;
+    const char  *detail;
+}   t_usage;
+
 typedef struct s_root
 {
 	t_history		*history;
@@ -200,6 +206,7 @@ int			history_print(t_history *history);
 int			exit_status(int status);
 int			exit_command(char **cmd, t_root *sh);
 void		exit_prompt(t_root *sh);
+int			usage(char **cmd);
 
 /* 09_QUOTE */
 
