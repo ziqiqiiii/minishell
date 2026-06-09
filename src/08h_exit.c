@@ -70,12 +70,9 @@ int	exit_command(char **cmd, t_root *sh)
  */
 void	exit_prompt(t_root *sh)
 {
-	if (sh->exit_cmd_flag == 1)
-	{
-		ft_close(sh->stdin_tmp);
-		ft_close(sh->stdout_tmp);
-		history_clear(&sh->history);
-		ft_lstclear(&sh->env_list, del_data);
-		free(sh->pipe);
-	}
+	ft_close(sh->stdin_tmp);
+	ft_close(sh->stdout_tmp);
+	history_clear(&sh->history);
+	ft_lstclear(&sh->env_list, del_data);
+	free(sh->pipe);
 }

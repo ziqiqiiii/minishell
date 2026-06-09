@@ -32,9 +32,6 @@ void	del_data(void	*content)
  */
 void	reset_data(t_root *sh, t_list **cmd_lexer, t_tree **head)
 {
-	t_list	*current;
-	t_list	*next;
-
 	ft_dup2(sh->stdin_tmp, STDIN_FILENO);
 	ft_dup2(sh->stdout_tmp, STDOUT_FILENO);
 	ft_tcsetattr(STDIN_FILENO, TCSANOW, &sh->current);
@@ -42,13 +39,7 @@ void	reset_data(t_root *sh, t_list **cmd_lexer, t_tree **head)
 		unlink(".here_doc_tmp");
 	free_tree(*head);
 	sh->tree_arg_value = NULL;
-	current = *cmd_lexer;
-	while (current)
-	{
-		next = current->next;
-		free(current);
-		current = next;
-	}
+	ft_lstclear(cmd_lexer, free);
 }
 
 /**
