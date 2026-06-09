@@ -1,5 +1,33 @@
 #include "minishell.h"
 
+static const t_usage g_usage[];
+static void print_general_usage(void);
+
+int usage(char **cmd)
+{
+    int i;
+
+    if (!cmd[1])
+    {
+        print_general_usage();
+        return (EXIT_SUCCESS);
+    }
+    i = 0;
+    while (g_usage[i].name)
+    {
+        if (ft_strncmp(cmd[1], g_usage[i].name, ft_strlen(g_usage[i].name) + 1) == 0)
+        {
+            puts(g_usage[i].detail);
+            return (EXIT_SUCCESS);
+        }
+        i++;
+    }
+    ft_putstr_fd("usage: no such built-in: ", 2);
+    ft_putstr_fd(cmd[1], 2);
+    ft_putstr_fd("\n", 2);
+    return (EXIT_FAILURE);
+}
+
 static const t_usage g_usage[] = {
     {"echo",    "\n\techo [-n] [arg...]\n"
                 "\t\tPrint args to stdout. -n suppresses trailing newline.\n"},
@@ -32,30 +60,4 @@ static void print_general_usage(void)
     printf("\t  usage <builtin>      detailed help for a command\n");
     printf("\t  <builtin> [args...]  run a built-in command\n");
     printf("\t  <cmd>     [args...]  run a program from $PATH\n\n");
-}
-
-int usage(char **cmd)
-{
-    int i;
-
-    if (!cmd[1])
-    {
-        print_general_usage();
-        return (EXIT_SUCCESS);
-    }
-    i = 0;
-    while (g_usage[i].name)
-    {
-        if (ft_strncmp(cmd[1], g_usage[i].name,
-                ft_strlen(g_usage[i].name) + 1) == 0)
-        {
-            puts(g_usage[i].detail);
-            return (EXIT_SUCCESS);
-        }
-        i++;
-    }
-    ft_putstr_fd("usage: no such built-in: ", 2);
-    ft_putstr_fd(cmd[1], 2);
-    ft_putstr_fd("\n", 2);
-    return (EXIT_FAILURE);
 }
