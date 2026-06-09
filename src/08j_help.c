@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-static const t_help g_help[]；
+static const t_help g_help[];
 
 int	help(void)
 {
