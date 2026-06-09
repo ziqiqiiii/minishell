@@ -20,6 +20,7 @@
 # include <sys/ioctl.h>			/* ioctl */
 # include <curses.h>			/* tgetent, tgetflag, tgetnum, tgetstr, tgoto,
 									tputs */
+# include <limits.h> 			/* PATH_MAX */
 
 # include "libft.h"
 # include "get_next_line.h"
