@@ -20,6 +20,33 @@ CYAN 		:= \033[1;36m
 RM			:= rm -rf
 
 ################################################################################
+#                               PROGRAM'S INCLUDES                             #
+################################################################################
+
+LIBFT_DIR = libft/
+LIBFT = libft.a
+LIB := -lft -L./$(LIBFT_DIR)
+
+UNAME 		= $(shell uname)
+
+# Readline flags for Linux
+ifeq ($(UNAME), Linux)
+READLINE = -lreadline
+INC_RL   = -I/usr/include/readline
+FSAN	 = -fsanitize=address -g3
+endif
+
+# Readline flags for MacOS
+ifeq ($(UNAME), Darwin)
+READLINE 	= -lreadline -L/usr/local/opt/readline/lib
+INC_RL		= -I/usr/local/opt/readline/include
+endif
+
+INC_DIR		= includes
+INC			= -I./$(INC_DIR)
+INC_LIBFT	= -I./$(LIBFT_DIR)$(INC_DIR)
+
+################################################################################
 #                                 PROGRAM'S SRCS                               #
 ################################################################################
 
@@ -74,12 +101,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 all: system-programs $(NAME)
 
-run:
+run: all
 	@ ./$(NAME)
 
 $(NAME): $(LIBFT) $(OBJ)
 	@ echo "\n$(GREEN)Compilation $(CLR_RMV)of $(BLUE) $(NAME) $(CLR_RMV)..."
-	@ $(CC) $(FLAGS) $(FSAN) $(LIB) $(READLINE) $(OBJ) $(LIBFT_DIR)/$(LIBFT) -o $(NAME)
+	@ $(CC) $(FLAGS) $(FSAN) $(LIB) $(READLINE) $(OBJ) $(LIBFT_DIR)$(LIBFT) -o $(NAME)
 	@ echo "$(GREEN)[Success] $(BLUE)$(NAME) $(CLR_RMV)created ✔️"
 
 $(LIBFT):
@@ -87,32 +114,6 @@ $(LIBFT):
 	@ $(MAKE) -C $(LIBFT_DIR)
 	@ echo "$(GREEN)Generating $(BLUE)minishell $(CLR_RMV)object files..."
 
-################################################################################
-#                               PROGRAM'S INCLUDES                             #
-################################################################################
-
-LIBFT_DIR = libft/
-LIBFT = libft.a
-LIB := -lft -L./$(LIBFT_DIR)
-
-UNAME 		= $(shell uname)
-
-# Readline flags for Linux
-ifeq ($(UNAME), Linux)
-READLINE = -lreadline
-INC_RL   = -I/usr/include/readline
-FSAN	 = -fsanitize=address -g3
-endif
-
-# Readline flags for MacOS
-ifeq ($(UNAME), Darwin)
-READLINE 	= -lreadline -L/usr/local/opt/readline/lib
-INC_RL		= -I/usr/local/opt/readline/include
-endif
-
-INC_DIR		= includes
-INC			= -I./$(INC_DIR)
-INC_LIBFT	= -I./$(LIBFT_DIR)$(INC_DIR)
 
 ################################################################################
 #                              SYSTEM PROGRAMS                                 #
