@@ -59,6 +59,14 @@ void print_path_with_colored_slash(const char *path) {
         }
 }
 
+/**
+ * @brief Recursively lists all non-hidden files under basePath with permissions.
+ *
+ * For each non-dotfile entry, prints the permission string (in red) followed
+ * by the full path (with colored slashes). Recurses into subdirectories.
+ *
+ * @param basePath Root directory to start listing from.
+ */
 void list_directory(const char *basePath) {
         char path[1000];
         struct dirent *dp;
@@ -96,6 +104,14 @@ void list_directory(const char *basePath) {
         closedir(dir);
 }
 
+/**
+ * @brief Entry point for the ldr utility.
+ *
+ * Recursively lists all non-hidden files in the current directory (".") with
+ * their permission strings and color-coded paths.
+ *
+ * @return EXIT_SUCCESS.
+ */
 int main(void) {
         // printf("Recursively listing all visible files under the current
         // directory with permissions:\n");
