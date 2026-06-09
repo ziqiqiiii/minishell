@@ -6,7 +6,10 @@ static void	heredoc_signal(int signum);
 
 /**
  * @brief Configures signal handlers based on the current shell mode.
- *
+ * 
+ * CTRL-C -> SIGINT
+ * CTRL-\ -> SIGQUIT
+ * 
  * Mode 1: prompt mode — SIGINT reprints the prompt, SIGQUIT is ignored.
  * Mode 0: execution mode — SIGINT and SIGQUIT pass through to the child.
  * Mode 2: heredoc mode — SIGINT exits the heredoc child, SIGQUIT is ignored.
@@ -44,11 +47,7 @@ void	signals(int mode)
 static void	signal_handler(int signum)
 {
 	if (signum == SIGQUIT)
-	{
-		rl_on_new_line();
-		rl_redisplay();
 		return ;
-	}
 	if (signum == SIGINT)
 	{
 		write(1, "\n", 1);
