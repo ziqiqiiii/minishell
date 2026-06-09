@@ -3,6 +3,13 @@
 
 char project_root[PATH_MAX];
 
+/**
+ * @brief Resolves the absolute path of the project root directory.
+ *
+ * Reads the executable's path via /proc/self/exe and navigates one level up
+ * if the binary resides in a "bin" subdirectory. Falls back to $HOME or "."
+ * if the symlink cannot be read. Result is stored in the global project_root.
+ */
 void resolve_project_root(void) {
         printf("resolving project root \n");
         char path[PATH_MAX];
@@ -30,6 +37,13 @@ void resolve_project_root(void) {
         printf("project root path: %s\n", project_root);
 }
 
+/**
+ * @brief Displays the status of all registered daemons.
+ *
+ * Reads tmp/daemons.reg and prints each entry with its name, PID, start
+ * timestamp, and whether the process is still alive (checked via /proc/<pid>).
+ * Prints a summary count of active daemons at the end.
+ */
 void dcheck(void) {
         char reg_path[PATH_MAX];
         strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -73,6 +87,13 @@ void dcheck(void) {
         printf("Active daemons: %d\n", count);
 }
 
+/**
+ * @brief Displays all entries in the daemon graveyard.
+ *
+ * Reads tmp/cematary.reg and prints each buried daemon entry with its name
+ * and PID. All entries are shown as inactive. Prints a count of buried daemons
+ * at the end.
+ */
 void dcheck_graveyard(void) {
         char reg_path[PATH_MAX];
         strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -110,6 +131,16 @@ void dcheck_graveyard(void) {
         printf("Daemons burried: %d\n\n", count);
 }
 
+/**
+ * @brief Entry point for the dcheck utility.
+ *
+ * Resolves the project root, then prints both the active daemon registry
+ * and the graveyard of terminated daemons.
+ *
+ * @param argc Number of command-line arguments (unused).
+ * @param argv Array of command-line arguments (unused).
+ * @return 0 on success.
+ */
 int main(int argc, char **argv) {
         (void)argc;
         (void)argv;

@@ -3,6 +3,17 @@
  List all files matching the name in args[1] under current directory and
  subdirectories
 */
+/**
+ * @brief Recursively searches for files whose names contain a keyword.
+ *
+ * Starting from the directory in args[0] (or "." when args[0] is "find"),
+ * traverses all subdirectories and prints the path of every entry whose name
+ * contains the substring in args[1].
+ *
+ * @param args Array where args[0] is the search root and args[1] is the keyword.
+ * @return EXIT_SUCCESS on completion, 1 if the keyword argument is missing or
+ *         the directory cannot be opened.
+ */
 int execute(char **args) {
 
         if (args[1] == NULL) {
@@ -86,6 +97,16 @@ int execute(char **args) {
         return EXIT_SUCCESS;
 }
 
+/**
+ * @brief Entry point for the find utility.
+ *
+ * Passes the argument vector directly to execute(), which treats args[0] as
+ * the command name / starting directory and args[1] as the search keyword.
+ *
+ * @param argc Number of command-line arguments (unused).
+ * @param args Array of command-line arguments forwarded to execute().
+ * @return The return value of execute().
+ */
 int main(int argc, char **args) {
         (void)argc;
         return execute(args);

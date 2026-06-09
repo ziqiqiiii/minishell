@@ -7,6 +7,13 @@
 
 char project_root[PATH_MAX];
 
+/**
+ * @brief Resolves the absolute path of the project root directory.
+ *
+ * Reads the executable's path via /proc/self/exe and navigates one level up
+ * if the binary resides in a "bin" subdirectory. Falls back to $HOME or "."
+ * if the symlink cannot be read. Result is stored in the global project_root.
+ */
 void resolve_project_root(void) {
         printf("resolving project root \n");
         char path[PATH_MAX];
@@ -40,6 +47,15 @@ typedef struct {
         char timestamp[128];
 } DaemonInfo;
 
+/**
+ * @brief Records a terminated daemon in the graveyard registry.
+ *
+ * Appends an entry to tmp/cematary.reg. If an entry with the same name
+ * already exists, a numeric suffix (.1, .2, …) is appended to avoid
+ * collisions. The entry includes the daemon name, PID, and termination time.
+ *
+ * @param rip Struct containing the name, PID, and timestamp of the daemon.
+ */
 void add_to_graveyard(DaemonInfo rip) {
         char reg_path[PATH_MAX];
         strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -86,6 +102,14 @@ void add_to_graveyard(DaemonInfo rip) {
         close(fd);
 }
 
+/**
+ * @brief Interactively kills one or all registered active daemons.
+ *
+ * Reads tmp/daemons.reg, filters to only living processes (via /proc/<pid>),
+ * lists them, and prompts the user to select a daemon by number, enter 'a' to
+ * kill all, or '0' to cancel. Killed daemons are added to the graveyard and
+ * the registry is cleared when all are terminated.
+ */
 void dkill(void) {
         char reg_path[PATH_MAX];
         strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -175,6 +199,15 @@ void dkill(void) {
         }
 }
 
+/**
+ * @brief Entry point for the dkill utility.
+ *
+ * Resolves the project root, then launches the interactive daemon-kill menu.
+ *
+ * @param argc Number of command-line arguments (unused).
+ * @param argv Array of command-line arguments (unused).
+ * @return 0 on success.
+ */
 int main(int argc, char **argv) {
         (void)argc;
         (void)argv;

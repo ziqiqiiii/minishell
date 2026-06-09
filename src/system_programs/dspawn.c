@@ -3,6 +3,13 @@
 
 char project_root[PATH_MAX];
 
+/**
+ * @brief Resolves the absolute path of the project root directory.
+ *
+ * Reads the executable's path via /proc/self/exe and navigates one level up
+ * if the binary resides in a "bin" subdirectory. Falls back to $HOME or "."
+ * if the symlink cannot be read. Result is stored in the global project_root.
+ */
 void resolve_project_root(void) {
         printf("resolving project root \n");
         char path[PATH_MAX];
@@ -30,6 +37,14 @@ void resolve_project_root(void) {
         printf("project root path: %s\n", project_root);
 }
 
+/**
+ * @brief Daemonizes the current process using a double-fork.
+ *
+ * Performs the standard Unix daemonization sequence: first fork exits the
+ * parent, setsid() creates a new session, a second fork prevents the daemon
+ * from reacquiring a terminal. Closes all open file descriptors and redirects
+ * stdin/stdout/stderr to /dev/null.
+ */
 void spawn_daemon(void) {
         printf("some kind of daemon spawning program\n");
         printf(
@@ -74,6 +89,11 @@ void spawn_daemon(void) {
         }
 }
 
+/**
+ * @brief Appends a spawn event for the dspawn daemon to the log file.
+ *
+ * Writes a timestamped entry to tmp/dspawn.log recording the current PID.
+ */
 void daemon_spawn_log(void) {
         char log_path[PATH_MAX];
         strncpy(log_path, project_root, sizeof(log_path) - 1);
@@ -91,6 +111,14 @@ void daemon_spawn_log(void) {
         close(fd);
 }
 
+/**
+ * @brief Appends an arbitrary message from the daemon to the log file.
+ *
+ * Writes a timestamped entry to tmp/dspawn.log containing the current PID
+ * and the provided message string.
+ *
+ * @param msg Message string to record in the log.
+ */
 void daemon_log(const char *msg) {
         char log_path[PATH_MAX];
         strncpy(log_path, project_root, sizeof(log_path) - 1);
@@ -109,6 +137,15 @@ void daemon_log(const char *msg) {
         close(fd);
 }
 
+/**
+ * @brief Registers a daemon by writing its name, PID, and timestamp to the registry.
+ *
+ * Appends an entry to tmp/daemons.reg. If a daemon with the same name already
+ * exists, a numeric suffix (.1, .2, …) is appended to the stored name to
+ * avoid collisions.
+ *
+ * @param name Base name to register for the current daemon process.
+ */
 void daemon_register(const char *name) {
         char reg_path[PATH_MAX];
         strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -154,6 +191,11 @@ void daemon_register(const char *name) {
         close(fd);
 }
 
+/**
+ * @brief Main event loop of the dspawn daemon.
+ *
+ * Runs indefinitely, logging one work-cycle message every 10 seconds.
+ */
 void daemon_work(void) {
         while (1) {
                 daemon_log("one work cycle");
@@ -161,6 +203,16 @@ void daemon_work(void) {
         }
 }
 
+/**
+ * @brief Entry point for the dspawn daemon.
+ *
+ * Resolves the project root, daemonizes the process, registers itself under
+ * the name "dspawnowo", logs the spawn event, and enters the work loop.
+ *
+ * @param argc Number of command-line arguments (unused).
+ * @param argv Array of command-line arguments (unused).
+ * @return 0 (never reached in normal operation).
+ */
 int main(int argc, char **argv) {
         (void)argc;
         (void)argv;

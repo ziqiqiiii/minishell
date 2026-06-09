@@ -22,6 +22,13 @@ typedef struct PlantSpace {
 	char name[64];
 } PlantSpace;
 
+/**
+ * @brief Resolves the absolute path of the project root directory.
+ *
+ * Reads the executable's path via /proc/self/exe and navigates one level up
+ * if the binary resides in a "bin" subdirectory. Falls back to $HOME or "."
+ * if the symlink cannot be read. Result is stored in the global project_root.
+ */
 void resolve_project_root(void) {
 	// printf("resolving project root \n");
 	char path[PATH_MAX];
@@ -49,6 +56,16 @@ void resolve_project_root(void) {
 	// printf("project root path: %s\n", project_root);
 }
 
+/**
+ * @brief Acquires an exclusive advisory lock for a named plant daemon.
+ *
+ * Creates or opens tmp/plant_<name>.lock and attempts a non-blocking
+ * exclusive flock. Stores the open file descriptor in plant_lock_fd so
+ * unlock_plant() can release it later.
+ *
+ * @param name Name of the plant daemon to lock.
+ * @return 1 if the lock was acquired, 0 if already held by another process.
+ */
 int plant_lock(const char *name) {
 	size_t len =
 		snprintf(NULL, 0, "%s/tmp/plant_%s.lock", project_root, name) + 1;
@@ -75,6 +92,12 @@ int plant_lock(const char *name) {
 	return 1;
 }
 
+/**
+ * @brief Releases the exclusive plant lock held in plant_lock_fd.
+ *
+ * Unlocks and closes the file descriptor acquired by plant_lock(). Safe to
+ * call even if plant_lock_fd is -1 (no-op in that case).
+ */
 void unlock_plant(void) {
 	if (plant_lock_fd != -1) {
 		flock(plant_lock_fd, LOCK_UN);
@@ -82,6 +105,14 @@ void unlock_plant(void) {
 	}
 }
 
+/**
+ * @brief Daemonizes the current process using a double-fork.
+ *
+ * Performs the standard Unix daemonization sequence: first fork exits the
+ * parent, setsid() creates a new session, a second fork prevents the daemon
+ * from reacquiring a terminal. Closes all open file descriptors and redirects
+ * stdin/stdout/stderr to /dev/null.
+ */
 void spawn_plant(void) {
 	printf("Spawning a plant\n");
 	// first fork
@@ -124,6 +155,14 @@ void spawn_plant(void) {
 	}
 }
 
+/**
+ * @brief Appends a spawn event for the named plant daemon to the log file.
+ *
+ * Writes a timestamped entry to tmp/dspawn.log recording the daemon name and
+ * current PID. Uses an exclusive flock to prevent interleaved writes.
+ *
+ * @param name Name of the plant daemon that was spawned.
+ */
 void daemon_spawn_log(const char *name) {
 	char log_path[PATH_MAX];
 	strncpy(log_path, project_root, sizeof(log_path) - 1);
@@ -143,6 +182,14 @@ void daemon_spawn_log(const char *name) {
 	close(fd);
 }
 
+/**
+ * @brief Appends an arbitrary message from the daemon to the log file.
+ *
+ * Writes a timestamped entry to tmp/dspawn.log containing the current PID
+ * and the provided message string.
+ *
+ * @param msg Message string to record in the log.
+ */
 void daemon_log(const char *msg) {
 	char log_path[PATH_MAX];
 	strncpy(log_path, project_root, sizeof(log_path) - 1);
@@ -162,6 +209,14 @@ void daemon_log(const char *msg) {
 	close(fd);
 }
 
+/**
+ * @brief Checks whether a daemon name exists in the active registry.
+ *
+ * Scans tmp/daemons.reg line by line for an exact name match.
+ *
+ * @param name Daemon name to look up.
+ * @return 1 if the name is found in the registry, 0 otherwise.
+ */
 int is_daemon_registered(const char *name) {
 	char reg_path[PATH_MAX];
 	strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -190,6 +245,14 @@ int is_daemon_registered(const char *name) {
 	return 0;
 }
 
+/**
+ * @brief Registers a daemon by writing its name, PID, and timestamp to the registry.
+ *
+ * Appends an entry to tmp/daemons.reg. Returns early without writing if the
+ * name is already present in the registry.
+ *
+ * @param name Name to register for the current daemon process.
+ */
 void daemon_register(const char *name) {
 	if (is_daemon_registered(name)) {
 		fprintf(stderr, "daemon name: %s already registered\n", name);
@@ -218,6 +281,17 @@ void daemon_register(const char *name) {
 	close(fd);
 }
 
+/**
+ * @brief Initializes a plant with default stats and writes the state file.
+ *
+ * Sets waterlevel and health to 100, level to 1, and both timestamps to the
+ * current time. Writes the PlantStats struct as raw binary to
+ * tmp/<name>.state.
+ *
+ * @param name  Name of the plant (used as the state filename).
+ * @param plant Pointer to the PlantStats struct to initialize and persist.
+ * @return 0 on success, -1 if the state file cannot be opened.
+ */
 int plant_init_state(const char *name, PlantStats *plant) {
 	plant->waterlevel = 100;
 	plant->health = 100;
@@ -247,6 +321,15 @@ int plant_init_state(const char *name, PlantStats *plant) {
 	return 0;
 }
 
+/**
+ * @brief Persists the current plant state to disk.
+ *
+ * Overwrites tmp/<name>.state with the raw PlantStats struct using an
+ * exclusive flock to prevent concurrent writes.
+ *
+ * @param name  Name of the plant (determines the state file path).
+ * @param plant Pointer to the PlantStats struct to write.
+ */
 void plant_save(const char *name, const PlantStats *plant) {
 	size_t len =
 		snprintf(NULL, 0, "%s/tmp/%s.state", project_root, name) + 1;
@@ -270,6 +353,16 @@ void plant_save(const char *name, const PlantStats *plant) {
 	free(state_path);
 }
 
+/**
+ * @brief Loads a plant's persisted state from disk.
+ *
+ * Reads the raw PlantStats struct from tmp/<name>.state into the provided
+ * pointer.
+ *
+ * @param name  Name of the plant (determines the state file path).
+ * @param plant Pointer to the PlantStats struct to populate.
+ * @return 0 if the state was read successfully, -1 otherwise.
+ */
 int plant_load(const char *name, PlantStats *plant) {
 	size_t len =
 		snprintf(NULL, 0, "%s/tmp/%s.state", project_root, name) + 1;
@@ -296,6 +389,15 @@ int plant_load(const char *name, PlantStats *plant) {
 	return -1;
 }
 
+/**
+ * @brief Waters the plant, increasing its water level by 20 (capped at 100).
+ *
+ * Loads the current state, applies the water increment, updates both the
+ * last_watered and last_updated timestamps, saves the new state, and prints
+ * a confirmation with the resulting water level.
+ *
+ * @param name Name of the plant to water.
+ */
 void plant_water(const char *name) {
 	size_t len =
 		snprintf(NULL, 0, "%s/tmp/%s.state", project_root, name) + 1;
@@ -335,6 +437,15 @@ void plant_water(const char *name) {
 	free(state_path);
 }
 
+/**
+ * @brief Checks whether a named plant daemon is currently alive.
+ *
+ * Looks up the name in tmp/daemons.reg and verifies the stored PID still
+ * exists in /proc.
+ *
+ * @param plantname Name of the plant daemon to check.
+ * @return 1 if an active process is found, 0 otherwise.
+ */
 int is_plant_running(const char *plantname) {
 	char reg_path[PATH_MAX];
 	strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -377,6 +488,15 @@ typedef struct {
 	char timestamp[128];
 } DaemonInfo;
 
+/**
+ * @brief Records a terminated daemon in the graveyard registry.
+ *
+ * Appends an entry to tmp/cematary.reg. If an entry with the same name
+ * already exists, a numeric suffix (.1, .2, …) is appended to prevent
+ * collisions. Uses the PID stored in rip rather than the calling PID.
+ *
+ * @param rip Struct containing the name, PID, and original timestamp of the daemon.
+ */
 void add_to_graveyard(DaemonInfo rip) {
 	char reg_path[PATH_MAX];
 	strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -424,6 +544,15 @@ void add_to_graveyard(DaemonInfo rip) {
 	close(fd);
 }
 
+/**
+ * @brief Automatically sends SIGTERM to all active daemons matching the given name.
+ *
+ * Scans tmp/daemons.reg for live entries whose name matches the argument,
+ * sends SIGTERM to each, and moves them to the graveyard. Intended for
+ * programmatic use (e.g., when a plant dies), not interactive selection.
+ *
+ * @param name Name of the daemon(s) to terminate.
+ */
 void dkill_auto(const char *name) {
 	char reg_path[PATH_MAX];
 	strncpy(reg_path, project_root, sizeof(reg_path) - 1);
@@ -486,6 +615,14 @@ void dkill_auto(const char *name) {
 	}
 }
 
+/**
+ * @brief Handles plant death: releases resources and terminates the daemon.
+ *
+ * Logs the death event, releases and removes the plant lock file, calls
+ * dkill_auto() to deregister the daemon, then exits the process.
+ *
+ * @param name Name of the plant that has died.
+ */
 void plant_died(const char *name) {
 	daemon_log("HP has hit 0, plant has died");
 	daemon_log("Natural plant death, died from hitting HP 0");
@@ -513,6 +650,17 @@ void plant_died(const char *name) {
 	exit(EXIT_SUCCESS);
 }
 
+/**
+ * @brief Main event loop of the plant daemon.
+ *
+ * Loads or initializes the plant state, then runs an infinite loop that
+ * wakes every 10 seconds. Each time at least 60 seconds have elapsed since
+ * last_updated, the loop drains the water level, adjusts health (and
+ * potentially levels up), saves state, and checks for death. Calls
+ * plant_died() if health reaches 0.
+ *
+ * @param name Name of the plant this daemon manages.
+ */
 void daemon_work(const char *name) {
 	PlantStats plant;
 	if (plant_load(name, &plant) != 0) {
@@ -557,6 +705,16 @@ void daemon_work(const char *name) {
 	}
 }
 
+/**
+ * @brief Loads and prints the current statistics for a plant.
+ *
+ * Reads the plant's state file and displays its name, water level, health,
+ * level, last watered time, and last updated time to stdout.
+ *
+ * @param plant_name  Name of the plant to query.
+ * @param statplant   Output pointer populated with the loaded PlantStats.
+ * @return 0 if stats were loaded and printed successfully, 1 otherwise.
+ */
 int plant_stats(const char *plant_name, PlantStats *statplant) {
 	if (plant_load(plant_name, statplant) == 0) {
 		printf("Plant:                     %s\n", plant_name);
@@ -573,6 +731,15 @@ int plant_stats(const char *plant_name, PlantStats *statplant) {
 	return 1;
 }
 
+/**
+ * @brief Respawns a previously registered but no-longer-running plant daemon.
+ *
+ * Verifies the daemon is not already alive and is present in the registry,
+ * then daemonizes the process, re-registers it, logs the spawn, and resumes
+ * the daemon work loop with the existing state.
+ *
+ * @param name Name of the plant daemon to respawn.
+ */
 void respawn_plant(const char *name) {
 	if (is_plant_running(name)) {
 		fprintf(stderr, "plant daemon is still alive\n");
@@ -594,6 +761,19 @@ void respawn_plant(const char *name) {
 	unlock_plant();
 }
 
+/**
+ * @brief Entry point for the dplant daemon manager.
+ *
+ * Dispatches based on argument count and subcommand:
+ *   dplant <name>           — spawn a new plant daemon.
+ *   dplant <name> water     — water the running plant.
+ *   dplant <name> stats     — print the plant's current stats.
+ *   dplant <name> respawn   — respawn a stopped but registered plant.
+ *
+ * @param argc Number of command-line arguments (2 or 3).
+ * @param argv Array of command-line arguments.
+ * @return 0 on success, 1 on invalid usage or error.
+ */
 int main(int argc, char **argv) {
 
 	if (argc < 2 || argc > 3) {

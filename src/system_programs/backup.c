@@ -3,6 +3,13 @@
 
 char project_root[PATH_MAX];
 
+/**
+ * @brief Resolves the absolute path of the project root directory.
+ *
+ * Reads the executable's path via /proc/self/exe and navigates one level up
+ * if the binary resides in a "bin" subdirectory. Falls back to $HOME or "."
+ * if the symlink cannot be read. Result is stored in the global project_root.
+ */
 void resolve_project_root(void) {
         printf("resolving project root \n");
         char path[PATH_MAX];
@@ -49,6 +56,17 @@ void backup(void) {
 }
 */
 
+/**
+ * @brief Archives the path specified by BACKUP_DIR into a timestamped tarball.
+ *
+ * Reads the BACKUP_DIR environment variable, creates a .tar.gz archive named
+ * <basename>_<YYYYMMDD_HHMMSS>.tar.gz in <project_root>/archive/, and forks
+ * a child process to run tar.
+ *
+ * @param argc Number of command-line arguments (unused).
+ * @param argv Array of command-line arguments (unused).
+ * @return 0 on success, 1 if BACKUP_DIR is unset or a system call fails.
+ */
 int main(int argc, char **argv) {
         (void)argc;
         (void)argv;
