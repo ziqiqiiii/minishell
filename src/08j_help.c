@@ -1,18 +1,6 @@
 #include "minishell.h"
 
-static const t_help g_help[] = {
-    {"echo",    "print args to stdout"},
-    {"cd",      "change working directory"},
-    {"pwd",     "print current working directory"},
-    {"export",  "set environment variables"},
-    {"unset",   "remove environment variables"},
-    {"env",     "print all environment variables"},
-    {"history", "print command history"},
-    {"exit",    "exit the shell"},
-    {"help",    "list all built-in commands"},
-    {"usage",   "show detailed help for a built-in"},
-    {NULL, NULL}
-};
+static const t_help g_help[]；
 
 int	help(void)
 {
@@ -28,3 +16,17 @@ int	help(void)
     printf("\nRun 'usage <builtin>' for detailed help.\n\n");
     return (EXIT_SUCCESS);
 }
+
+static const t_help g_help[] = {
+    {"echo",    "print args to stdout"},
+    {"cd",      "change working directory"},
+    {"pwd",     "print current working directory"},
+    {"export",  "set environment variables"},
+    {"unset",   "remove environment variables"},
+    {"env",     "print all environment variables"},
+    {"history", "print command history"},
+    {"exit",    "exit the shell"},
+    {"help",    "list all built-in commands"},
+    {"usage",   "show detailed help for a built-in"},
+    {NULL, NULL}
+};
