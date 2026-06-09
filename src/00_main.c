@@ -1,6 +1,7 @@
 #include "minishell.h"
 
 static int	init_root(t_root *sh, char **envp);
+static void	add_local_bin_to_path();
 static void	init_token_check(t_token_check	*tkchk);
 static void	print_banner(void);
 
@@ -44,6 +45,7 @@ int	main(int argc, char **argv, char **envp)
  */
 static int	init_root(t_root *sh, char **envp)
 {
+	add_local_bin_to_path();
 	sh->history = NULL;
 	init_token_check(sh->tkchk);
 	sh->tree_arg_value = NULL;
@@ -54,6 +56,8 @@ static int	init_root(t_root *sh, char **envp)
 	sh->env_list = NULL;
 	if (env_link_list(envp, &sh->env_list) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	// if (add_local_bin_to_path(&sh->env_list) == EXIT_FAILURE)
+	// 	return (EXIT_FAILURE);
 	sh->pipe = ft_calloc(2, sizeof(int));
 	if (!sh->pipe)
 		return (EXIT_FAILURE);
@@ -68,6 +72,24 @@ static int	init_root(t_root *sh, char **envp)
 	sh->exit_cmd_flag = 0;
 	return (EXIT_SUCCESS);
 }
+
+/**
+ * @brief Prepends "<PWD>/bin" to PATH so the shell resolves local binaries
+ *        before falling back to system directories.
+ *
+ * Reads PATH and PWD from the environment, builds "<PWD>/bin:<PATH>",
+ * and writes it back with setenv(). If PATH is unset, the new value is
+ * "<PWD>/bin" with no trailing colon.
+ */
+static void add_local_bin_to_path(void) {
+    char 		new_path[PATH_MAX * 2];
+    const char *old;
+
+	old = getenv("PATH");
+    snprintf(new_path, sizeof(new_path), "%s/bin:%s", getenv("PWD"), old ? old : "");
+    setenv("PATH", new_path, 1);
+}
+
 
 /**
  * @brief Initializes the token check array.
