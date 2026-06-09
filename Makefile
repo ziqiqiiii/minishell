@@ -1,8 +1,8 @@
-#  |  |  ___ \    \  |         |
-#  |  |     ) |  |\/ |   _  |  |  /   _
-# ___ __|  __/   |   |  (   |    <    __/
-#    _|  _____| _|  _| \__,_| _|\_\ \___|
-#                              by jcluzet
+#    \  |         |
+#  |\/ |   _  |  |  /   _
+#  |   |  (   |    <    __/
+# _|  _| \__,_| _|\_\ \___|
+#                              
 ################################################################################
 #                                     CONFIG                                   #
 ################################################################################
@@ -11,30 +11,13 @@ NAME		:= minishell
 CC			:= gcc
 FLAGS		:= -Wall -Wextra -Werror
 
-################################################################################
-#                               PROGRAM'S INCLUDES                             #
-################################################################################
-
-LIBFT_DIR = libft/
-LIBFT = libft.a
-LIB := -lft -L./$(LIBFT_DIR)
-
-UNAME 		= $(shell uname)
-
-ifeq ($(UNAME), Linux)
-READLINE = -lreadline
-INC_RL   = -I/usr/include/readline
-FSAN	 = -fsanitize=address -g3
-endif
-
-ifeq ($(UNAME), Darwin)
-READLINE 	= -lreadline -L/usr/local/opt/readline/lib
-INC_RL		= -I/usr/local/opt/readline/include
-endif
-
-INC_DIR		= includes
-INC			= -I./$(INC_DIR)
-INC_LIBFT	= -I./$(LIBFT_DIR)$(INC_DIR)
+CLR_RMV		:= \033[0m
+RED		    := \033[1;31m
+GREEN		:= \033[1;32m
+YELLOW		:= \033[1;33m
+BLUE		:= \033[1;34m
+CYAN 		:= \033[1;36m
+RM			:= rm -rf
 
 ################################################################################
 #                                 PROGRAM'S SRCS                               #
@@ -89,14 +72,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 #                                  Makefile  objs                              #
 ################################################################################
 
+all: system-programs $(NAME)
 
-CLR_RMV		:= \033[0m
-RED		    := \033[1;31m
-GREEN		:= \033[1;32m
-YELLOW		:= \033[1;33m
-BLUE		:= \033[1;34m
-CYAN 		:= \033[1;36m
-RM			:= rm -f
+run:
+	@ ./$(NAME)
 
 $(NAME): $(LIBFT) $(OBJ)
 	@ echo "\n$(GREEN)Compilation $(CLR_RMV)of $(BLUE) $(NAME) $(CLR_RMV)..."
@@ -108,25 +87,131 @@ $(LIBFT):
 	@ $(MAKE) -C $(LIBFT_DIR)
 	@ echo "$(GREEN)Generating $(BLUE)minishell $(CLR_RMV)object files..."
 
-all: $(NAME)
+################################################################################
+#                               PROGRAM'S INCLUDES                             #
+################################################################################
 
-bonus: all
+LIBFT_DIR = libft/
+LIBFT = libft.a
+LIB := -lft -L./$(LIBFT_DIR)
 
-run:
-	@ ./$(NAME)
+UNAME 		= $(shell uname)
+
+# Readline flags for Linux
+ifeq ($(UNAME), Linux)
+READLINE = -lreadline
+INC_RL   = -I/usr/include/readline
+FSAN	 = -fsanitize=address -g3
+endif
+
+# Readline flags for MacOS
+ifeq ($(UNAME), Darwin)
+READLINE 	= -lreadline -L/usr/local/opt/readline/lib
+INC_RL		= -I/usr/local/opt/readline/include
+endif
+
+INC_DIR		= includes
+INC			= -I./$(INC_DIR)
+INC_LIBFT	= -I./$(LIBFT_DIR)$(INC_DIR)
+
+################################################################################
+#                              SYSTEM PROGRAMS                                 #
+################################################################################
+
+SYS_NAME	:= system_programs
+SYS_SRC_DIR	:= ./src/$(SYS_NAME)
+BIN_DIR		:= ./bin
+
+SYS_SOURCES	:= $(wildcard $(SYS_SRC_DIR)/*.c)
+SYS_BINS	:= $(patsubst $(SYS_SRC_DIR)/%.c,$(BIN_DIR)/%,$(SYS_SOURCES))
+
+sys-header:
+	@ echo "$(GREEN)Generating $(CYAN)$(SYS_NAME) $(CLR_RMV)binaries..."
+
+$(BIN_DIR)/%: $(SYS_SRC_DIR)/%.c
+	@ mkdir -p $(BIN_DIR)
+	@ $(CC) $(FLAGS) -I$(SYS_SRC_DIR) -o $@ $<
+	@ printf "$(YELLOW)$<$(CLR_RMV)... "
+
+system-programs: sys-header $(SYS_BINS)
+	@ echo "\n$(GREEN)[Success] $(BLUE)$(SYS_NAME) $(CLR_RMV)created ✔️"
+
+################################################################################
+#                                    TESTS                                     #
+################################################################################
+
+TESTS_DIR		:= ./tests
+UNIT_DIR		:= $(TESTS_DIR)/unit
+INTEGRATION_DIR	:= $(TESTS_DIR)/integration
+UNITY_DIR		:= $(TESTS_DIR)/unity
+UNIT_BIN_DIR	:= $(UNIT_DIR)/bin
+
+UNIT_SOURCES	:= $(wildcard $(UNIT_DIR)/test_*.c)
+UNIT_BINS		:= $(UNIT_SOURCES:$(UNIT_DIR)/%.c=$(UNIT_BIN_DIR)/%)
+
+TEST_CFLAGS		:= -I./$(INC_DIR) -I./$(INC_DIR)/libs -I$(UNITY_DIR) -Wall -Wextra
+
+$(UNIT_BIN_DIR)/test_%: $(UNIT_DIR)/test_%.c $(UNITY_DIR)/unity.c
+	@mkdir -p $(UNIT_BIN_DIR)
+	$(CC) $(TEST_CFLAGS) $^ $(EXTRA_SRC) -o $@
+
+unit: $(UNIT_BINS)
+	@echo "==> Running unit tests"
+	@pass=0; fail=0; \
+	for t in $(UNIT_BINS); do \
+	  echo "--- $$t ---"; \
+	  if $$t; then pass=$$((pass+1)); else fail=$$((fail+1)); fi; \
+	done; \
+	echo ""; \
+	echo "Unit tests: $$pass passed, $$fail failed"; \
+	test $$fail -eq 0
+
+integration: $(NAME) $(SYS_BINS)
+	@echo "==> Running integration tests"
+	@pass=0; fail=0; \
+	for s in $(INTEGRATION_DIR)/*.sh; do \
+	  [ -f "$$s" ] || continue; \
+	  echo "--- $$s ---"; \
+	  if bash $$s; then pass=$$((pass+1)); else fail=$$((fail+1)); fi; \
+	done; \
+	echo ""; \
+	echo "Integration tests: $$pass passed, $$fail failed"; \
+	test $$fail -eq 0
+
+test: unit integration
+
+ai-unit-tests:
+	@if [ -z "$(MODULE)" ]; then \
+	  echo "Usage: make ai-unit-tests MODULE=name"; \
+	  echo "  Looks for includes/libs/name.h"; \
+	  echo "  Generates tests/unit/test_name.c"; \
+	  exit 1; \
+	fi
+	@bash ./scripts/gen_unit_tests.sh $(MODULE)
+
+################################################################################
+#                                   CLEANUP                                    #
+################################################################################
 
 clean:
 	@ $(RM) *.o */*.o */*/*.o
 	@ $(RM) -r $(OBJ_DIR)
+	@ $(RM) -r $(UNIT_BIN_DIR)
 	@ echo "$(RED)Deleting $(BLUE)$(NAME) $(CLR_RMV)objs ✔️"
 
 fclean: clean
 	@ $(RM) $(NAME)
+	@ $(RM) $(SYS_BINS)
 	@ $(MAKE) fclean -C $(LIBFT_DIR)
 	@ echo "$(RED)Deleting $(BLUE)$(NAME) $(CLR_RMV)binary ✔️"
 
-re:			fclean all
+re: fclean all
 
-.PHONY:		all clean fclean re
+################################################################################
+#                              PHONY && PRECIOUS                               #
+################################################################################
+
+.PHONY:		all clean fclean re run \
+			system-programs sys-header unit integration test ai-unit-tests
 
 .PRECIOUS:	$(NAME) $(OBJ)
