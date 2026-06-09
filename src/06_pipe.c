@@ -92,14 +92,14 @@ static void	pipe_child_process(t_tree *node, char **envp, t_root *sh)
 	{
 		if (node->left->token != HEREDOC)
 			left_child(sh->pipe, node, envp, sh);
-		exit(g_exit_status);
+		_exit(g_exit_status);
 	}
 	children[1] = ft_fork();
 	if (children[1] == 0)
 	{
 		if (node->right->token != HEREDOC)
 			right_child(sh->pipe, node, envp, sh);
-		exit(g_exit_status);
+		_exit(g_exit_status);
 	}
 	ft_close(sh->pipe[1]);
 	ft_close(sh->pipe[0]);
