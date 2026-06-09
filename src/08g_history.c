@@ -49,7 +49,9 @@ void	history_clear(t_history **history)
 		free(tmp);
 	}
 	*history = NULL;
-	clear_history();
+	rl_clear_history();
+	free(rl_line_buffer);
+	rl_line_buffer = NULL;
 }
 
 /**
