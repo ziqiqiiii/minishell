@@ -2,6 +2,14 @@
 
 static const t_help g_help[];
 
+/**
+ * @brief Lists all built-in commands with a one-line description each.
+ *
+ * Iterates the g_help table and prints each built-in name and its short
+ * description, then reminds the user to run 'usage <builtin>' for details.
+ *
+ * @return EXIT_SUCCESS.
+ */
 int	help(void)
 {
     int i;

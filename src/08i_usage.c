@@ -3,6 +3,17 @@
 static const t_usage g_usage[];
 static void print_general_usage(void);
 
+/**
+ * @brief Displays usage information for built-in commands.
+ *
+ * With no argument, prints a general usage summary. With an argument,
+ * looks up the named built-in in the g_usage table and prints its
+ * detailed help string.
+ *
+ * @param cmd Array of command strings; cmd[1] is the optional built-in name.
+ * @return EXIT_SUCCESS on success, or EXIT_FAILURE if the named built-in
+ *         is not found.
+ */
 int usage(char **cmd)
 {
     int i;
@@ -53,6 +64,9 @@ static const t_usage g_usage[] = {
     {NULL, NULL}
 };
 
+/**
+ * @brief Prints a summary of how to invoke minishell built-ins and programs.
+ */
 static void print_general_usage(void)
 {
     printf("\nminishell usage:\n");
