@@ -21,6 +21,7 @@
 # include <curses.h>			/* tgetent, tgetflag, tgetnum, tgetstr, tgoto,
 									tputs */
 # include <limits.h> 			/* PATH_MAX */
+# include <string.h>
 
 # include "libft.h"
 # include "get_next_line.h"
@@ -254,5 +255,9 @@ int			ft_tcsetattr(int fd, int optional_actions, \
 int			array2d_len(char **str);
 void		str_to_lower(char **str);
 void		print_exec_cmd(char **cmd);
+
+/* 15_RC */
+
+void		source_rc(t_root *sh, char **envp);
 
 #endif
