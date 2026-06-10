@@ -1,4 +1,4 @@
-
+#include "minishell.h"
 
 /**
  * @brief Forks a child process, exiting on failure.

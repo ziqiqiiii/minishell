@@ -85,7 +85,9 @@ SRC			:= $(addsuffix .c, \
 					10_signal\
 					11_free\
 					12_minishell_utils\
-					13_minishell_utils2)
+					13_minishell_utils2\
+					14_minishell_utils3\
+					)
 
 OBJ_DIR		:= ./obj
 OBJ			:= $(SRC:%.c=$(OBJ_DIR)/%.o)
