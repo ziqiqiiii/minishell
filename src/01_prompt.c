@@ -19,7 +19,6 @@ void	prompt(t_root *sh, char **envp)
 
 	while (TRUE)
 	{
-		signals(1);
 		prompt_str = get_prompt_str();
 		cmd = readline(prompt_str);
 		free(prompt_str);
@@ -100,7 +99,6 @@ static int	lexer_paser_exec(t_root *sh, char **envp, char **cmd)
 		return (-1);
 	head = parser(cmd_lexer, ft_lstsize(cmd_lexer), sh);
 	ft_tcsetattr(STDIN_FILENO, TCSANOW, &sh->previous);
-	signals(0);
 	recurse_bst(head, envp, sh);
 	reset_data(sh, &cmd_lexer, &head);
 	return (0);

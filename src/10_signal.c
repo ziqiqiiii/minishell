@@ -1,39 +1,61 @@
 #include "minishell.h"
 
-static void	signal_handler(int signum);
-static void	signal_handler2(int signum);
-static void	heredoc_signal(int signum);
+static void	sigint_handler(int signum);
+static void	heredoc_sigint_handler(int signum);
 
 /**
- * @brief Configures signal handlers based on the current shell mode.
- * 
- * CTRL-C -> SIGINT
- * CTRL-\ -> SIGQUIT
- * 
- * Mode 1: prompt mode — SIGINT reprints the prompt, SIGQUIT is ignored.
- * Mode 0: execution mode — SIGINT and SIGQUIT pass through to the child.
- * Mode 2: heredoc mode — SIGINT exits the heredoc child, SIGQUIT is ignored.
+ * @brief Configures signal handling for the interactive shell prompt.
  *
- * @param mode Integer selecting the signal-handler set to install.
+ * Installs sigint_handler for SIGINT so Ctrl-C reprints the prompt, and
+ * ignores SIGQUIT and SIGTSTP so Ctrl-\ and Ctrl-Z have no effect.
  */
-void	signals(int mode)
+void	shell_ignore_signals(void)
 {
-	if (mode == 1)
-	{
-		signal(SIGINT, signal_handler);
-		signal(SIGQUIT, signal_handler);
-	}
-	else if (mode == 0)
-	{
-		signal(SIGINT, signal_handler2);
-		signal(SIGQUIT, signal_handler2);
-	}
-	else if (mode == 2)
-	{
-		signal(SIGINT, heredoc_signal);
-		signal(SIGQUIT, SIG_IGN);
-	}
-	return ;
+    struct sigaction	sa;
+
+    memset(&sa, 0, sizeof sa);
+    sa.sa_handler = sigint_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;           /* restart interrupted syscalls */
+
+    sigaction(SIGINT, &sa, NULL);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
+}
+
+/**
+ * @brief Restores default signal handling in a child process.
+ *
+ * Resets SIGINT, SIGQUIT, and SIGTSTP to SIG_DFL so that the child
+ * process behaves like a normal program rather than inheriting the
+ * shell's custom handlers.
+ */
+void	child_restore_signals(void)
+{
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
+	signal(SIGTSTP, SIG_DFL);
+}
+
+/**
+ * @brief Configures signal handling for the heredoc child process.
+ *
+ * Installs heredoc_sigint_handler for SIGINT so Ctrl-C causes the heredoc
+ * child to exit immediately, allowing the parent to detect cancellation.
+ * SIGQUIT and SIGTSTP are ignored.
+ */
+void	heredoc_restore_signals(void)
+{
+    struct sigaction	sa;
+
+    memset(&sa, 0, sizeof sa);
+    sa.sa_handler = heredoc_sigint_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;           /* restart interrupted syscalls */
+
+    sigaction(SIGINT, &sa, NULL);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
 }
 
 /**
@@ -44,39 +66,15 @@ void	signals(int mode)
  *
  * @param signum The signal number received.
  */
-static void	signal_handler(int signum)
+static void	sigint_handler(int signum)
 {
-	if (signum == SIGQUIT)
-		return ;
-	if (signum == SIGINT)
-	{
-		write(1, "\n", 1);
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-		return ;
-	}
-}
+	(void) signum;
 
-/**
- * @brief Handles SIGINT and SIGQUIT during command execution (mode 0).
- *
- * On SIGINT, writes a newline. On SIGQUIT, writes "Quit: 3" to mimic
- * standard shell behaviour when a child is terminated by SIGQUIT.
- *
- * @param signum The signal number received.
- */
-static void	signal_handler2(int signum)
-{
-	if (signum == SIGINT)
-	{
-		write(1, "\n", 1);
-		return ;
-	}
-	if (signum == SIGQUIT)
-	{
-		write(1, "Quit: 3\n", 8);
-	}
+	write(1, "\n", 1);
+	rl_replace_line("", 0);
+	rl_on_new_line();
+	rl_redisplay();
+	return ;
 }
 
 /**
@@ -87,8 +85,9 @@ static void	signal_handler2(int signum)
  *
  * @param signum The signal number received.
  */
-static void	heredoc_signal(int signum)
+static void	heredoc_sigint_handler(int signum)
 {
-	if (signum == SIGINT)
-		exit(EXIT_FAILURE);
+	(void) signum;
+	
+	exit(EXIT_FAILURE);
 }

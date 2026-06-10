@@ -46,19 +46,27 @@ int	heredoc_fd(char *node_value, t_root *sh)
  */
 static int	heredoc_parent(pid_t child_pid, char *delim)
 {
-	int	fd;
+	int					fd;
+	struct 	sigaction	sa_old;
 
-	signal(SIGQUIT, SIG_IGN);
-	waitpid(child_pid, &g_exit_status, 0);
+	/* ignore while waiting */
+	sigint_ignore(&sa_old);	
+	waitpid(child_pid, &g_exit_status, WUNTRACED);
+	ft_kill(child_pid);
+	sigint_restore(&sa_old);
+
 	g_exit_status = exit_status(g_exit_status);
+
 	free(delim);
-	if (g_exit_status == 255)
+
+	if (g_exit_status != 0)
 		return (-1);
 	if (access(".here_doc_tmp", F_OK & X_OK) != 0)
 	{
 		printf("Error: %s: %s\n", strerror(errno), ".here_doc_tmp");
 		return (-1);
 	}
+
 	fd = ft_open(".here_doc_tmp", O_RDONLY, 0666);
 	return (fd);
 }
@@ -79,9 +87,10 @@ static void	heredoc_child(t_root *sh, char *delim, int heredoc_fd)
 	char	*line;
 	char	*tmp;
 
+	heredoc_restore_signals();
+
 	while (TRUE)
 	{
-		signals(2);
 		line = heredoc_input(sh, delim);
 		if (ft_strncmp(line, delim, ft_strlen(delim) + 1) == 0)
 		{

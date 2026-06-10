@@ -225,9 +225,11 @@ char		*remove_quote(char *str);
 
 /* 10_SIGNAL */
 
-void		signals(int mode);
 void		shell_ignore_signals(void);
 void		child_restore_signals(void);
+void		heredoc_restore_signals(void);
+void		sigint_ignore(struct sigaction *old);
+void		sigint_restore(struct sigaction *old);
 
 /* 11_FREE */
 

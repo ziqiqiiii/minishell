@@ -45,6 +45,7 @@ int	main(int argc, char **argv, char **envp)
  */
 static int	init_root(t_root *sh, char **envp)
 {
+	shell_ignore_signals();
 	add_local_bin_to_path();
 	sh->history = NULL;
 	init_token_check(sh->tkchk);

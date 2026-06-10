@@ -85,32 +85,40 @@ static void	right_child(int *pipe, t_tree *node, char **envp, t_root *sh);
  */
 static void	pipe_child_process(t_tree *node, char **envp, t_root *sh)
 {
-	pid_t	children[2];
+	pid_t				children[2];
+	struct sigaction	sa_old;
 
 	children[0] = ft_fork();
 	if (children[0] == 0)
 	{
-		signals(0);
+		child_restore_signals();
 		if (node->left->token != HEREDOC)
 			left_child(sh->pipe, node, envp, sh);
 		_exit(g_exit_status);
 	}
+	
 	children[1] = ft_fork();
 	if (children[1] == 0)
 	{
-		signals(0);
+		child_restore_signals();
 		if (node->right->token != HEREDOC)
 			right_child(sh->pipe, node, envp, sh);
 		_exit(g_exit_status);
 	}
+
 	ft_close(sh->pipe[1]);
 	ft_close(sh->pipe[0]);
 	sh->pipe[1] = 0;
 	sh->pipe[0] = 0;
+
+	/* ignore while waiting */
+	sigint_ignore(&sa_old);
 	waitpid(children[0], &g_exit_status, WUNTRACED);
-	ft_killl(children[0]);
+	ft_kill(children[0]);
 	waitpid(children[1], &g_exit_status, WUNTRACED);
-	ft_killl(children[1]);
+	ft_kill(children[1]);
+	sigint_restore(&sa_old);
+
 	g_exit_status = exit_status(g_exit_status);
 }
 
