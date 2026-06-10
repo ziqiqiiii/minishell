@@ -8,6 +8,8 @@ static void	heredoc_sigint_handler(int signum);
  *
  * Installs sigint_handler for SIGINT so Ctrl-C reprints the prompt, and
  * ignores SIGQUIT and SIGTSTP so Ctrl-\ and Ctrl-Z have no effect.
+ *
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 void	shell_ignore_signals(void)
 {
@@ -29,6 +31,8 @@ void	shell_ignore_signals(void)
  * Resets SIGINT, SIGQUIT, and SIGTSTP to SIG_DFL so that the child
  * process behaves like a normal program rather than inheriting the
  * shell's custom handlers.
+ *
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 void	child_restore_signals(void)
 {
@@ -43,6 +47,8 @@ void	child_restore_signals(void)
  * Installs heredoc_sigint_handler for SIGINT so Ctrl-C causes the heredoc
  * child to exit immediately, allowing the parent to detect cancellation.
  * SIGQUIT and SIGTSTP are ignored.
+ *
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 void	heredoc_restore_signals(void)
 {
@@ -65,6 +71,7 @@ void	heredoc_restore_signals(void)
  * simply redraws the prompt without any output.
  *
  * @param signum The signal number received.
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 static void	sigint_handler(int signum)
 {
@@ -84,6 +91,7 @@ static void	sigint_handler(int signum)
  * detect cancellation via the child's exit status.
  *
  * @param signum The signal number received.
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 static void	heredoc_sigint_handler(int signum)
 {
