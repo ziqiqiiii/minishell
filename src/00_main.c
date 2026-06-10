@@ -27,6 +27,7 @@ int	main(int argc, char **argv, char **envp)
 	if (init_root(&sh, envp) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
 	print_banner();
+	source_rc(&sh, envp);
 	prompt(&sh, envp);
 	exit_prompt(&sh);
 	return (g_exit_status);

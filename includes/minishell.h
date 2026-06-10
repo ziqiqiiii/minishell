@@ -22,6 +22,8 @@
 									tputs */
 # include <limits.h> 			/* PATH_MAX */
 # include <string.h>
+# include <fcntl.h>				/* open flags */
+# include <libgen.h>			/* dirname */
 
 # include "libft.h"
 # include "get_next_line.h"

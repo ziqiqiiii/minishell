@@ -1,0 +1,6 @@
+# MiniShell start-up file
+# Add one command per line; blank lines and # comments are ignored.
+
+clear
+cal
+ls
