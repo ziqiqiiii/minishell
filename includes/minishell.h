@@ -144,11 +144,15 @@ typedef struct s_root
 	int				exit_cmd_flag;
 }	t_root;
 
-/* 01_PROMPT */
+/* 01_RC */
+
+void		source_rc(t_root *sh, char **envp);
+
+/* 02_PROMPT */
 
 void		prompt(t_root *sh, char **envp);
 
-/* 02_EXPAND */
+/* 03_EXPAND */
 
 char		*expand(char *cmd, t_list **env_list);
 void		single_quote(t_expand_var *data);
@@ -157,7 +161,7 @@ void		replace_exit_status(t_expand_var *data);
 char		*sub_or_join(char *cmd, char *start, int len, char *substring);
 char		*key_check(char *input);
 
-/* 03_LEXER */
+/* 04_LEXER */
 
 t_list		*lexer(char *cmd);
 int			count_token(char *cmd);
@@ -165,14 +169,14 @@ int			count_sp_char(char *cmd);
 int			count_char(char *cmd);
 void		cmd_modifier(char *cmd, char **tokens);
 
-/* 04_PARSER */
+/* 05_PARSER */
 
 t_tree		*parser(t_list *lexer, int n_token, t_root *sh);
 t_tree		*tree_node_new(t_token type, char *value, \
 							t_tree *left, t_tree *right);
 void		print_tree(t_tree *root, int b);
 
-/* 05_EXECUTE */
+/* 06_EXECUTE */
 
 void		recurse_bst(t_tree *node, char **envp, t_root *sh);
 char		**cmd_join(char **res, t_root *sh);
@@ -180,11 +184,11 @@ char		**find_path(t_list **env_list);
 char		*join_path(t_list **env_list, char *cmd);
 char		*get_exe_path(char *argv, t_list **env_list);
 
-/* 06_PIPE */
+/* 07_PIPE */
 
 void		pipe_handler(t_tree *node, char **envp, t_root *sh);
 
-/* 07_REDIRECTION */
+/* 08_REDIRECTION */
 
 void		rdin_handler(t_tree *node, char **envp, t_root *sh);
 void		rdout_handler(t_tree *node, char **envp, t_root *sh);
@@ -196,7 +200,7 @@ int			rdapp_fd(char *node_value, t_root *sh);
 char		*find_file(char *value);
 int			heredoc_fd(char *node_value, t_root *sh);
 
-/* 08_BUILTIN */
+/* 09_BUILTIN */
 
 int			builtin(char **cmd, t_root *sh);
 int			echo_command(char **cmd);
@@ -219,14 +223,14 @@ void		exit_prompt(t_root *sh);
 int			usage(char **cmd);
 int			help(void);
 
-/* 09_QUOTE */
+/* 10_QUOTE */
 
 char		**cmd_quote_handler(char const *s, char c);
 int			is_quote(char c);
 int			quote_count(char *cmd);
 char		*remove_quote(char *str);
 
-/* 10_SIGNAL */
+/* 11_SIGNAL */
 
 void		shell_ignore_signals(void);
 void		child_restore_signals(void);
@@ -234,14 +238,14 @@ void		heredoc_restore_signals(void);
 void		sigint_ignore(struct sigaction *old);
 void		sigint_restore(struct sigaction *old);
 
-/* 11_FREE */
+/* 12_FREE */
 
 void		del_data(void	*content);
 void		reset_data(t_root *sh, t_list **cmd_lexer, t_tree **head);
 void		free_2d(char **str);
 void		free_tree(t_tree *node);
 
-/* 12_MINISHELL_UTILS */
+/* 13_MINISHELL_UTILS */
 
 int			ft_pipe(int p[2]);
 int			ft_dup2(int new_fd, int old_fd);
@@ -257,9 +261,5 @@ int			ft_tcsetattr(int fd, int optional_actions, \
 int			array2d_len(char **str);
 void		str_to_lower(char **str);
 void		print_exec_cmd(char **cmd);
-
-/* 15_RC */
-
-void		source_rc(t_root *sh, char **envp);
 
 #endif
