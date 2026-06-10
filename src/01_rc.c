@@ -15,6 +15,7 @@ static void	create_empty_rc(const char *path);
  *
  * @param sh The shell root structure.
  * @param envp Environment variables.
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 void	source_rc(t_root *sh, char **envp)
 {
@@ -47,6 +48,7 @@ void	source_rc(t_root *sh, char **envp)
  *
  * @param rc_path Out buffer (PATH_MAX) for "<bindir>/.minishellrc".
  * @param home_path Out buffer (PATH_MAX) for "$HOME/.minishellrc".
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 static void	get_rc_paths(char *rc_path, char *home_path)
 {
@@ -77,6 +79,7 @@ static void	get_rc_paths(char *rc_path, char *home_path)
  * @param fd Open file descriptor positioned at the start of the rc file.
  * @param sh The shell root structure.
  * @param envp Environment variables.
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 static void	run_rc(int fd, t_root *sh, char **envp)
 {
@@ -109,6 +112,7 @@ static void	run_rc(int fd, t_root *sh, char **envp)
  * @param sh The shell root structure.
  * @param envp Environment variables.
  * @param line The trimmed command line (not freed by this function).
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 static void	exec_rc_line(t_root *sh, char **envp, char *line)
 {
@@ -137,6 +141,7 @@ static void	exec_rc_line(t_root *sh, char **envp, char *line)
  * silently returns if the file is already present.
  *
  * @param path Absolute file path at which to create the rc file.
+ * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
 static void	create_empty_rc(const char *path)
 {
