@@ -57,6 +57,7 @@ static void	exec_cmd(char *argv, char **envp, t_root *sh)
 	child = ft_fork();
 	if (child == 0)
 	{
+		signals(0);
 		if (execve(path, cmd, envp) == -1)
 		{
 			ft_dup2(sh->stdout_tmp, STDOUT_FILENO);
@@ -64,7 +65,8 @@ static void	exec_cmd(char *argv, char **envp, t_root *sh)
 			exit(EXIT_NO_CMD);
 		}
 	}
-	waitpid(child, &g_exit_status, 0);
+	waitpid(child, &g_exit_status, WUNTRACED);
+	ft_killl(child);
 	g_exit_status = exit_status(g_exit_status);
 	free(path);
 	free_2d(cmd);

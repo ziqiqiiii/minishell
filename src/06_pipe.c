@@ -90,6 +90,7 @@ static void	pipe_child_process(t_tree *node, char **envp, t_root *sh)
 	children[0] = ft_fork();
 	if (children[0] == 0)
 	{
+		signals(0);
 		if (node->left->token != HEREDOC)
 			left_child(sh->pipe, node, envp, sh);
 		_exit(g_exit_status);
@@ -97,6 +98,7 @@ static void	pipe_child_process(t_tree *node, char **envp, t_root *sh)
 	children[1] = ft_fork();
 	if (children[1] == 0)
 	{
+		signals(0);
 		if (node->right->token != HEREDOC)
 			right_child(sh->pipe, node, envp, sh);
 		_exit(g_exit_status);
@@ -105,8 +107,10 @@ static void	pipe_child_process(t_tree *node, char **envp, t_root *sh)
 	ft_close(sh->pipe[0]);
 	sh->pipe[1] = 0;
 	sh->pipe[0] = 0;
-	waitpid(children[0], &g_exit_status, 0);
-	waitpid(children[1], &g_exit_status, 0);
+	waitpid(children[0], &g_exit_status, WUNTRACED);
+	ft_killl(children[0]);
+	waitpid(children[1], &g_exit_status, WUNTRACED);
+	ft_killl(children[1]);
 	g_exit_status = exit_status(g_exit_status);
 }
 

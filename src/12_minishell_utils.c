@@ -21,6 +21,29 @@ int	ft_pipe(int p[2])
 }
 
 /**
+ * @brief Duplicates a file descriptor, exiting on failure.
+ *
+ * Calls dup2(2) to make old_fd refer to the same file as new_fd.
+ * Terminates the process with an error message if the call fails.
+ *
+ * @param new_fd The source file descriptor to duplicate.
+ * @param old_fd The target file descriptor to replace.
+ * @return The value of old_fd on success, or exits on failure.
+ */
+int	ft_dup2(int new_fd, int old_fd)
+{
+	int	i;
+
+	i = dup2(new_fd, old_fd);
+	if (i < 0)
+	{
+		printf("Error: Failed to dup2\n");
+		exit(EXIT_FAILURE);
+	}
+	return (i);
+}
+
+/**
  * @brief Opens a file, exiting on failure.
  *
  * Calls open(2) with the given flags and permission bits. Terminates the
@@ -46,29 +69,6 @@ int	ft_open(const char *file, int flags, int permission)
 }
 
 /**
- * @brief Forks a child process, exiting on failure.
- *
- * Calls fork(2) and terminates the process with an error message if
- * the system call fails.
- *
- * @return The PID of the child process in the parent (0 in the child),
- *         or exits on failure.
- */
-int	ft_fork(void)
-{
-	pid_t	child;
-
-	child = fork();
-	if (child < 0)
-	{
-		printf("fork: %d\n", getpid());
-		ft_putstr_fd("Error: Failed to create child process\n", 2);
-		exit(EXIT_FAILURE);
-	}
-	return (child);
-}
-
-/**
  * @brief Closes a file descriptor, exiting on failure.
  *
  * Calls close(2) and terminates the process with an error message if
@@ -86,27 +86,4 @@ int	ft_close(int fd)
 		exit(EXIT_FAILURE);
 	}
 	return (0);
-}
-
-/**
- * @brief Duplicates a file descriptor, exiting on failure.
- *
- * Calls dup2(2) to make old_fd refer to the same file as new_fd.
- * Terminates the process with an error message if the call fails.
- *
- * @param new_fd The source file descriptor to duplicate.
- * @param old_fd The target file descriptor to replace.
- * @return The value of old_fd on success, or exits on failure.
- */
-int	ft_dup2(int new_fd, int old_fd)
-{
-	int	i;
-
-	i = dup2(new_fd, old_fd);
-	if (i < 0)
-	{
-		printf("Error: Failed to dup2\n");
-		exit(EXIT_FAILURE);
-	}
-	return (i);
 }

@@ -226,6 +226,8 @@ char		*remove_quote(char *str);
 /* 10_SIGNAL */
 
 void		signals(int mode);
+void		shell_ignore_signals(void);
+void		child_restore_signals(void);
 
 /* 11_FREE */
 
@@ -237,13 +239,16 @@ void		free_tree(t_tree *node);
 /* 12_MINISHELL_UTILS */
 
 int			ft_pipe(int p[2]);
-int			ft_open(const char *file, int flags, int permission);
-int			ft_fork(void);
-int			ft_close(int fd);
 int			ft_dup2(int new_fd, int old_fd);
+int			ft_open(const char *file, int flags, int permission);
+int			ft_close(int fd);
+
+int			ft_fork(void);
+void 		ft_kill(int pid);
 int			ft_tcgetattr(int fd, struct termios *termios_p);
 int			ft_tcsetattr(int fd, int optional_actions, \
 							struct termios *termios_p);
+
 int			array2d_len(char **str);
 void		str_to_lower(char **str);
 void		print_exec_cmd(char **cmd);
