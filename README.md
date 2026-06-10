@@ -1,5 +1,5 @@
 # minishell
-42KL Minishell Project
+Minishell in C
 
 File Structure Guide
 - Store all .c program files under "src".
