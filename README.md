@@ -43,14 +43,12 @@ A POSIX-like shell implemented in C. Supports interactive prompts, command histo
 
 **Linux (Debian/Ubuntu)**
 ```bash
-sudo apt install libreadline-dev=8.0-4
+sudo apt install libreadline-dev
 ```
 
 **macOS (Homebrew)**
 ```bash
-brew tap-new $USER/old-readline
-brew extract --version=8.2 readline $USER/old-readline
-brew install $USER/old-readline/readline@8.2
+brew install readline
 ```
 
 **WSL (Windows Subsystem for Linux)**
@@ -58,7 +56,7 @@ brew install $USER/old-readline/readline@8.2
 WSL runs a Linux distribution, so use the same command as Linux:
 ```bash
 sudo apt update
-sudo apt install libreadline-dev=8.0-4
+sudo apt install libreadline-dev
 ```
 
 ---
