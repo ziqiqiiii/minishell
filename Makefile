@@ -139,7 +139,7 @@ sys-header:
 
 $(BIN_DIR)/%: $(SYS_SRC_DIR)/%.c
 	@ mkdir -p $(BIN_DIR)
-	@ $(CC) $(FLAGS) -I$(SYS_SRC_DIR) -o $@ $<
+	@ $(CC) $(FLAGS) $(INC) -o $@ $<
 	@ printf "$(YELLOW)$<$(CLR_RMV)... "
 
 system-programs: sys-header $(SYS_BINS)
