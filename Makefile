@@ -38,9 +38,11 @@ endif
 
 # Readline flags for MacOS
 ifeq ($(UNAME), Darwin)
-READLINE 	= -lreadline -L/usr/local/opt/readline/lib
-INC_RL		= -I/usr/local/opt/readline/include
+RL_PREFIX	= $(shell brew --prefix readline)
+READLINE 	= -lreadline -L$(RL_PREFIX)/lib
+INC_RL		= -I$(RL_PREFIX)/include
 endif
+
 
 INC_DIR		= includes
 INC			= -I./$(INC_DIR)
