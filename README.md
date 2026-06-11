@@ -36,8 +36,8 @@ A POSIX-like shell implemented in C. Supports interactive prompts, command histo
 
 ### GCC and Make
 
-- **Linux / WSL**: `sudo apt install build-essential`
-- **macOS**: `xcode-select --install`
+- **Linux / WSL**: `sudo apt update && sudo apt install build-essential`
+- **macOS**: `brew install gcc`
 
 ### Readline
 
