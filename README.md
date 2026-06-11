@@ -66,7 +66,7 @@ sudo apt install libreadline-dev
 Clone the repository and build with `make`:
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/ziqiqiiii/minishell.git
 cd minishell
 make
 ```
@@ -77,7 +77,7 @@ Other Makefile targets:
 
 | Command      | Description                            |
 |--------------|----------------------------------------|
-| `make`       | Build everything                       |
+| `make`       | Build everything (`make all`)          |
 | `make run`   | Build and launch minishell immediately |
 | `make clean` | Remove object files                    |
 | `make fclean`| Remove object files and binary         |
