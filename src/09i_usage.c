@@ -61,6 +61,10 @@ static const t_usage g_usage[] = {
                 "\t\tList all built-in commands.\n"},
     {"usage",   "\n\tusage [builtin]\n"
                 "\t\tShow detailed help for a built-in command.\n"},
+    {"setenv",  "\n\tsetenv [name=value]...\n"
+                "\t\tSet environment variables. Alias for export.\n"},
+    {"unsetenv", "\n\tunsetenv [name]...\n"
+                "\t\tRemove environment variables. Alias for unset.\n"},
     {NULL, NULL}
 };
 

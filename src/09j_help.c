@@ -36,5 +36,7 @@ static const t_help g_help[] = {
     {"exit",    "exit the shell"},
     {"help",    "list all built-in commands"},
     {"usage",   "show detailed help for a built-in"},
+    {"setenv",  "set environment variables (alias for export)"},
+    {"unsetenv", "remove environment variables (alias for unset)"},
     {NULL, NULL}
 };
