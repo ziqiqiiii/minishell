@@ -114,7 +114,7 @@ run: all
 
 $(NAME): $(LIBFT) $(OBJ)
 	@ echo "\n$(GREEN)Compilation $(CLR_RMV)of $(BLUE) $(NAME) $(CLR_RMV)..."
-	@ $(CC) $(FLAGS) $(FSAN) $(LIB) $(READLINE) $(OBJ) $(LIBFT_DIR)$(LIBFT) -o $(NAME)
+	@ $(CC) $(FLAGS) $(FSAN) $(OBJ) $(LIBFT_DIR)$(LIBFT) $(LIB) $(READLINE) -o $(NAME)
 	@ echo "$(GREEN)[Success] $(BLUE)$(NAME) $(CLR_RMV)created ✔️"
 
 $(LIBFT):
