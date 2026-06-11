@@ -222,6 +222,8 @@ int			exit_command(char **cmd, t_root *sh);
 void		exit_prompt(t_root *sh);
 int			usage(char **cmd);
 int			help(void);
+int			set_env(char **cmd, t_list **env_list);
+int			unset_env(char **cmd, t_list **env_list);
 
 /* 10_QUOTE */
 

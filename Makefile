@@ -83,6 +83,8 @@ SRC			:= $(addsuffix .c, \
 					09h_exit\
 					09i_usage\
 					09j_help\
+					09k_setenv\
+					09l_unsetenv\
 					10_quote\
 					10a_quote_utils\
 					11_signal\

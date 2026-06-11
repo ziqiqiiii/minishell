@@ -35,6 +35,10 @@ int	builtin(char **cmd, t_root *sh)
 		g_exit_status = usage(cmd);
 	else if (ft_strncmp(cmd[0], "help", ft_strlen("help") + 1) == 0)
 		g_exit_status = help();
+	else if (ft_strncmp(cmd[0], "setenv", ft_strlen("setenv") + 1) == 0)
+		g_exit_status = set_env(cmd, &sh->env_list);
+	else if (ft_strncmp(cmd[0], "unsetenv", ft_strlen("unsetenv") + 1) == 0)
+		g_exit_status = unset_env(cmd, &sh->env_list);
 	else
 		return (0);
 	free_2d(cmd);
