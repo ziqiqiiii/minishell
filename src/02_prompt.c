@@ -63,7 +63,7 @@ static char	*get_prompt_str(void)
 	if (p == NULL)
 		return (NULL);
 	ft_strlcpy(p, "\001" GREEN "\002", p_size);
-	ft_strlcat(p, "Minishell:", p_size);
+	ft_strlcat(p, "MacMini_Shell:", p_size);
 	ft_strlcat(p, "\001" BLUE "\002", p_size);
 	ft_strlcat(p, cwd, p_size);
 	ft_strlcat(p, "\001" RESET "\002", p_size);

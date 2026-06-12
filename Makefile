@@ -7,7 +7,7 @@
 #                                     CONFIG                                   #
 ################################################################################
 
-NAME		:= minishell
+NAME		:= macmini_shell
 CC			:= gcc
 FLAGS		:= -Wall -Wextra -Werror
 

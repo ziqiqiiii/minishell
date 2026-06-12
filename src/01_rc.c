@@ -62,11 +62,11 @@ static void	get_rc_paths(char *rc_path, char *home_path)
 	if (n != -1)
 	{
 		path[n] = '\0';
-		snprintf(rc_path, PATH_MAX, "%s/.minishellrc", dirname(path));
+		snprintf(rc_path, PATH_MAX, "%s/.macminishellrc", dirname(path));
 	}
 	home = getenv("HOME");
 	if (home)
-		snprintf(home_path, PATH_MAX, "%s/.minishellrc", home);
+		snprintf(home_path, PATH_MAX, "%s/.macminishellrc", home);
 }
 
 /**
