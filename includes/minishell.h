@@ -142,6 +142,7 @@ typedef struct s_root
 	struct termios	current;
 	int				heredoc_flag;
 	int				exit_cmd_flag;
+	char			*current_dir;
 }	t_root;
 
 /* 01_RC */
@@ -263,5 +264,6 @@ int			ft_tcsetattr(int fd, int optional_actions, \
 int			array2d_len(char **str);
 void		str_to_lower(char **str);
 void		print_exec_cmd(char **cmd);
+char		*get_current_directory(void);
 
 #endif

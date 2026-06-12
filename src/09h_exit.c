@@ -75,4 +75,5 @@ void	exit_prompt(t_root *sh)
 	history_clear(&sh->history);
 	ft_lstclear(&sh->env_list, del_data);
 	free(sh->pipe);
+	free(sh->current_dir);
 }

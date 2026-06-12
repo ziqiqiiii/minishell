@@ -142,7 +142,11 @@ $(BIN_DIR)/%: $(SYS_SRC_DIR)/%.c
 	@ $(CC) $(FLAGS) $(INC) -o $@ $<
 	@ printf "$(YELLOW)$<$(CLR_RMV)... "
 
-system-programs: sys-header $(SYS_BINS)
+$(BIN_DIR)/logo.txt: $(SYS_SRC_DIR)/logo.txt
+	@ mkdir -p $(BIN_DIR)
+	@ cp $< $@
+
+system-programs: sys-header $(SYS_BINS) $(BIN_DIR)/logo.txt
 	@ echo "\n$(GREEN)[Success] $(BLUE)$(SYS_NAME) $(CLR_RMV)created ✔️"
 
 ################################################################################

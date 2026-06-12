@@ -1,7 +1,6 @@
 #include "minishell.h"
 
-
-static void	get_rc_paths(char *rc_path, char *home_path);
+static void	get_rc_paths(t_root *sh, char *rc_path, char *home_path);
 static void	run_rc(int fd, t_root *sh, char **envp);
 static void	exec_rc_line(t_root *sh, char **envp, char *line);
 static void	create_empty_rc(const char *path);
@@ -23,12 +22,13 @@ void	source_rc(t_root *sh, char **envp)
 	char	home_path[PATH_MAX];
 	int		fd;
 
-	get_rc_paths(rc_path, home_path);
+	get_rc_paths(sh, rc_path, home_path);
+	// printf("%s \n %s \n", rc_path, home_path);
 	fd = -1;
 	if (rc_path[0])
-		fd = open(rc_path, O_RDONLY);
+		fd = ft_open(rc_path, O_RDONLY, 0666);
 	if (fd == -1 && home_path[0])
-		fd = open(home_path, O_RDONLY);
+		fd = ft_open(home_path, O_RDONLY, 0666);
 	if (fd != -1)
 	{
 		run_rc(fd, sh, envp);
@@ -50,20 +50,14 @@ void	source_rc(t_root *sh, char **envp)
  * @param home_path Out buffer (PATH_MAX) for "$HOME/.minishellrc".
  * @see https://github.com/natalieagus/C-Shell-custom/tree/master
  */
-static void	get_rc_paths(char *rc_path, char *home_path)
+static void	get_rc_paths(t_root *sh, char *rc_path, char *home_path)
 {
-	char		path[PATH_MAX];
-	ssize_t		n;
 	const char	*home;
 
 	rc_path[0] = '\0';
 	home_path[0] = '\0';
-	n = readlink("/proc/self/exe", path, sizeof(path) - 1);
-	if (n != -1)
-	{
-		path[n] = '\0';
-		snprintf(rc_path, PATH_MAX, "%s/.macminishellrc", dirname(path));
-	}
+	sh->current_dir = get_current_directory();
+	snprintf(rc_path, PATH_MAX, "%s/.macminishellrc", sh->current_dir);
 	home = getenv("HOME");
 	if (home)
 		snprintf(home_path, PATH_MAX, "%s/.macminishellrc", home);

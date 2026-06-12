@@ -3,7 +3,8 @@
 static int	init_root(t_root *sh, char **envp);
 static void	add_local_bin_to_path();
 static void	init_token_check(t_token_check	*tkchk);
-static void	print_banner(void);
+static void	print_banner(t_root *sh);
+static void load_banner(t_root *sh);
 
 int	g_exit_status = EXIT_SUCCESS;
 
@@ -26,8 +27,8 @@ int	main(int argc, char **argv, char **envp)
 	(void) argc;
 	if (init_root(&sh, envp) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
-	print_banner();
 	source_rc(&sh, envp);
+	print_banner(&sh);
 	prompt(&sh, envp);
 	exit_prompt(&sh);
 	return (g_exit_status);
@@ -117,6 +118,25 @@ static void	init_token_check(t_token_check	*tkchk)
 	tkchk[5].op = NULL;
 	tkchk[6].token = END;
 	tkchk[6].op = NULL;
+}	
+
+static void load_banner(t_root *sh)
+{
+	int		fd;
+	char	*line;
+	char	file[1000];
+
+	snprintf(file, 1000, "%s/banner.txt", sh->current_dir);
+	fd = ft_open(file, O_RDONLY, 0666);
+	line = get_next_line(fd);
+	while (line)
+	{
+		printf("%s", line);
+		free(line);
+		line = get_next_line(fd);
+	}
+	printf("\n");
+	free(line);
 }
 
 /**
@@ -124,20 +144,15 @@ static void	init_token_check(t_token_check	*tkchk)
  *
  * This function prints the banner to the standard output.
  */
-static void	print_banner(void)
+static void	print_banner(t_root *sh)
 {
 	printf("\n");
 	printf("\033[1;31m");
-	printf("  __  __               __  __ _       _      _____ _          _ _ \n");
-	printf(" |  \\/  |  _ _   ___  |  \\/  (_)_ __ (_)    / ____| |        | | |\n");
-	printf(" | |\\/| | / _` |/ __| | |\\/| | | '_ \\| |     (___ | |__   ___| | |\n");
-	printf(" | |  | || (_| | (__  | |  | | | | | | |    \\___ \\| '_ \\ / _ \\ | |\n");
-	printf(" | |  | ||     |     \\| |  | | | | | | |    ____) | | | |  __/ | |\n");
-	printf(" |_|  |_| \\__,_|\\____/|_|  |_|_|_| |_|_|    \\____/|_| |_|\\___|_|_|\n");
+	load_banner(sh);
 	printf("\033[0m");
 	printf("\n");
 	printf("\033[1;32m");
-	printf("          Welcome to MacMini Shell!\n");
+	printf("                    Welcome to MacMini Shell!\n");
 	printf("\033[0m");
 	printf("\n");
 }
