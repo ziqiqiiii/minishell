@@ -58,7 +58,7 @@ dkms.conf
 # Program files
 minishell
 *.tmp*
-*.txt
+.txt
 tmp/
 failed_cmd.md
 quote.md
