@@ -55,7 +55,9 @@ INC_LIBFT	= -I./$(LIBFT_DIR)$(INC_DIR)
 SRC_DIR		:= ./src
 SRC			:= $(addsuffix .c, \
 					00_main \
-					01_rc\
+					01a_init\
+					01b_rc\
+					01c_banner\
 					02_prompt\
 					03_expand\
 					03a_expand_utils\
@@ -90,9 +92,9 @@ SRC			:= $(addsuffix .c, \
 					11_signal\
 					11a_sigwait\
 					12_free\
-					13_minishell_utils\
-					14_minishell_utils2\
-					15_minishell_utils3\
+					13a_minishell_utils\
+					13b_minishell_utils2\
+					13c_minishell_utils3\
 				)
 
 OBJ_DIR		:= ./obj

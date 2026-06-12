@@ -145,9 +145,19 @@ typedef struct s_root
 	char			*current_dir;
 }	t_root;
 
+
+/* 01_INIT */
+
+int			init_root(t_root *sh, char **envp);
+
 /* 01_RC */
 
 void		source_rc(t_root *sh, char **envp);
+
+/* 01_BANNER */
+
+void		print_banner(t_root *sh);
+
 
 /* 02_PROMPT */
 
