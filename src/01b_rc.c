@@ -26,9 +26,9 @@ void	source_rc(t_root *sh, char **envp)
 	// printf("%s \n %s \n", rc_path, home_path);
 	fd = -1;
 	if (rc_path[0])
-		fd = ft_open(rc_path, O_RDONLY, 0666);
+		fd = open(rc_path, O_RDONLY);
 	if (fd == -1 && home_path[0])
-		fd = ft_open(home_path, O_RDONLY, 0666);
+		fd = open(home_path, O_RDONLY);
 	if (fd != -1)
 	{
 		run_rc(fd, sh, envp);
@@ -145,9 +145,10 @@ static void	create_empty_rc(const char *path)
 	fd = open(path, O_CREAT | O_EXCL | O_WRONLY, 0644);
 	if (fd == -1)
 		return ;
-	header = "# MiniShell start-up file\n"
+	header = "# MacMini Shell start-up file\n"
 		"# Add one command per line; blank lines and # comments"
-		" are ignored.\n\n";
+		" are ignored.\n"
+		"\n# Manifesting Mac Mini\n";
 	write(fd, header, ft_strlen(header));
 	close(fd);
 }
