@@ -57,6 +57,8 @@ static void load_logo(void)
 		line_len = strlen(line);
 		if (line_len > 0 && line[line_len - 1] == '\n')
 			line[--line_len] = '\0';
+		if (line_len > 0 && line[line_len - 1] == '\r')
+			line[--line_len] = '\0';
 		vis_w = utf8_display_width(line);
 		if (vis_w > max_logo_width)
 			max_logo_width = vis_w;
