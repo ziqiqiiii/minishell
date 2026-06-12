@@ -87,6 +87,8 @@ static void	run_rc(int fd, t_root *sh, char **envp)
 		len = ft_strlen(line);
 		if (len > 0 && line[len - 1] == '\n')
 			line[len - 1] = '\0';
+		if (len > 0 && line[len - 2] == '\r')
+			line[len - 2] = '\0';
 		s = line;
 		while (*s == ' ' || *s == '\t')
 			s++;
@@ -142,9 +144,7 @@ static void	create_empty_rc(const char *path)
 	int			fd;
 	const char	*header;
 
-	fd = open(path, O_CREAT | O_EXCL | O_WRONLY, 0644);
-	if (fd == -1)
-		return ;
+	fd = ft_open(path, O_CREAT | O_EXCL | O_WRONLY, 0644);
 	header = "# MacMini Shell start-up file\n"
 		"# Add one command per line; blank lines and # comments"
 		" are ignored.\n"
