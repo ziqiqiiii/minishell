@@ -48,6 +48,8 @@ static char	*get_prompt_str(void)
 	char	cwd[1024];
 	char	*p;
 	size_t	p_size;
+	char	*shell_name = "MacMini_Shell:";
+	char	*dollar_sign = "$ ";
 
 	ft_memset(cwd, 0, 1024);
 	getcwd(cwd, 1024);
@@ -57,18 +59,15 @@ static char	*get_prompt_str(void)
 		ft_memmove(cwd + 1, cwd + ft_strlen(getenv("HOME")), \
 				ft_strlen(cwd + ft_strlen(getenv("HOME"))) + 1);
 	}
-	p_size = ft_strlen(cwd) + ft_strlen(GREEN) + ft_strlen(BLUE) \
-			+ ft_strlen(RESET) + 13 + 8;
-	p = (char *)ft_calloc(p_size, sizeof(char));
+	p_size = snprintf(NULL, 0, "\001" GREEN "\002%s\001" BLUE "\002%s\001" RESET "\002%s",
+					shell_name, cwd, dollar_sign) + 1;
+	p = ft_calloc(p_size, sizeof(char));
 	if (p == NULL)
 		return (NULL);
-	ft_strlcpy(p, "\001" GREEN "\002", p_size);
-	ft_strlcat(p, "MacMini_Shell:", p_size);
-	ft_strlcat(p, "\001" BLUE "\002", p_size);
-	ft_strlcat(p, cwd, p_size);
-	ft_strlcat(p, "\001" RESET "\002", p_size);
-	ft_strlcat(p, "$ ", p_size);
+	snprintf(p, p_size, "\001" GREEN "\002%s\001" BLUE "\002%s\001" RESET "\002%s",
+			shell_name, cwd, dollar_sign);
 	return (p);
+
 }
 
 /**
