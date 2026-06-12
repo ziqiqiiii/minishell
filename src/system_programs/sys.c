@@ -4,17 +4,66 @@
 
 #define MAX_LINES 32
 #define INFO_WIDTH 80
+#define MAX_LOGO_LINES 64
+#define MAX_LOGO_WIDTH 256
 
-static const char *logo[] = {
-    "                              ", " ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ ",
-    "██                          ██", "██             ▄▀           ██",
-    "██         ▄██████▄         ██", "██         ████████         ██",
-    "██         ▀██████▀         ██", "██                          ██",
-    " ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ", "                              ",
-};
+static char *logo[MAX_LOGO_LINES];
+static int logo_count = 0;
+static int max_logo_width = 0;
 
 static char *info[MAX_LINES];
 static int info_count = 0;
+
+static int utf8_display_width(const char *s)
+{
+	int w = 0;
+	while (*s)
+	{
+		if (((unsigned char)*s & 0xC0) != 0x80)
+			w++;
+		s++;
+	}
+	return w;
+}
+
+static void load_logo(void)
+{
+	char	line[MAX_LOGO_WIDTH];
+	FILE	*f;
+	size_t	line_len;
+	int	vis_w;
+	char	exe[512];
+	char	*slash;
+	char	*path;
+	ssize_t	exe_len;
+
+	exe_len = readlink("/proc/self/exe", exe, sizeof(exe) - 1);
+	if (exe_len < 0)
+		return;
+	exe[exe_len] = '\0';
+	slash = strrchr(exe, '/');
+	if (slash)
+		*slash = '\0';
+	path = malloc(strlen(exe) + strlen("/logo.txt") + 1);
+	if (!path)
+		return;
+	snprintf(path, strlen(exe) + strlen("/logo.txt") + 1, "%s/logo.txt", exe);
+	f = fopen(path, "r");
+	free(path);
+	if (!f)
+		return;
+	while (logo_count < MAX_LOGO_LINES && fgets(line, sizeof(line), f))
+	{
+		line_len = strlen(line);
+		if (line_len > 0 && line[line_len - 1] == '\n')
+			line[--line_len] = '\0';
+		vis_w = utf8_display_width(line);
+		if (vis_w > max_logo_width)
+			max_logo_width = vis_w;
+		logo[logo_count++] = strdup(line);
+	}
+	fclose(f);
+}
 
 /**
  * @brief Formats a string and appends it to the info display buffer.
@@ -26,7 +75,8 @@ static int info_count = 0;
  * @param disp printf-style format string.
  * @param ...  Variadic arguments matching the format string.
  */
-void display_line(const char *disp, ...) {
+static void display_line(const char *disp, ...)
+{
         if (info_count >= MAX_LINES)
                 return;
 
@@ -45,19 +95,17 @@ void display_line(const char *disp, ...) {
  * Retrieves the passwd entry for the current UID and appends the username,
  * home directory, and UID:GID to the info buffer via display_line().
  */
-void userinfo(void) {
+static void userinfo(void)
+{
         // do not pass this pointer to free!
         struct passwd *pw = getpwuid(getuid());
         struct rusage ru;
+        
         getrusage(RUSAGE_SELF, &ru);
 
         display_line("User:               %s", pw->pw_name);
         display_line("Home:               %s", pw->pw_dir);
         display_line("UID:GID:            %d:%d", pw->pw_uid, pw->pw_gid);
-        // express timeval struct tv_sec seconds value
-        // damn sys is too short, both are 0
-        // display_line("User CPU Time:      %lds\n", ru.ru_utime.tv_sec);
-        // display_line("System CPU Time:    %lds\n", ru.ru_stime.tv_sec);
 }
 
 /**
@@ -66,8 +114,10 @@ void userinfo(void) {
  * Uses sysinfo(2) to retrieve uptime, free RAM, buffer RAM, shared RAM, and
  * total RAM, then appends each value (in MiB or minutes) to the info buffer.
  */
-void resourceinfo(void) {
+static void resourceinfo(void)
+{
         struct sysinfo si;
+
         sysinfo(&si);
 
         display_line("Uptime:             %ld min", si.uptime / 60);
@@ -84,14 +134,18 @@ void resourceinfo(void) {
  * the kernel name, release, and machine architecture. Appends both to the
  * info buffer via display_line().
  */
-void systeminfo(void) {
-        FILE *f = fopen("/etc/os-release", "r");
+static void systeminfo(void)
+{
+        FILE            *f;
+        char            osversion[256];
+        struct utsname  un;
+        
+        f = fopen("/etc/os-release", "r");
         if (!f) {
                 perror("os-release");
                 return;
         }
 
-        char osversion[256];
         while (fgets(osversion, sizeof(osversion), f)) {
                 if (strncmp(osversion, "PRETTY_NAME=", 12) == 0) {
                         char *start = strchr(osversion, '=') + 1;
@@ -106,13 +160,25 @@ void systeminfo(void) {
         }
         fclose(f);
 
-        struct utsname un;
         uname(&un);
+        display_line("Kernel:             %s  %s  (%s)", un.sysname, un.release, un.machine);
+}
 
-        display_line("Kernel:             %s  %s  (%s)", un.sysname, un.release,
-                     un.machine);
-        // display_line("OS:                 %s\n", un.version); // not very
-        // readable
+static void render()
+{
+        int lines = (logo_count > info_count) ? logo_count : info_count;
+
+        for (int i = 0; i < lines; ++i) {
+                const char *l = (i < logo_count) ? logo[i] : "";
+                const char *r = (i < info_count) ? info[i] : "";
+                int pad = max_logo_width - utf8_display_width(l);
+                printf("%s%*s  %s\n", l, pad, "", r);
+        }
+
+        for (int i = 0; i < logo_count; ++i)
+                free(logo[i]);
+        for (int i = 0; i < info_count; ++i)
+                free(info[i]);
 }
 
 /**
@@ -127,23 +193,15 @@ void systeminfo(void) {
  * @return 0 on success.
  */
 int main(int argc, char **argv) {
+
         (void)argc;
         (void)argv;
 
+        load_logo();
         userinfo();
         resourceinfo();
         systeminfo();
+        render();
 
-        int logo_lines = sizeof(logo) / sizeof(logo[0]);
-        int lines = (logo_lines > info_count) ? logo_lines : info_count;
-
-        for (int i = 0; i < lines; ++i) {
-                const char *l = (i < logo_lines) ? logo[i] : "              ";
-                const char *r = (i < info_count) ? info[i] : "";
-                printf("%s  %s\n", l, r);
-        }
-
-        for (int i = 0; i < lines; ++i)
-                free(info[i]);
         return 0;
 }
