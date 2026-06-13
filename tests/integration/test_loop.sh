@@ -11,8 +11,8 @@
 
 set -euo pipefail
 
-INPUT=$(printf "ld\n\n\nnotacommand_xyz\nld\nexit\n")
-OUTPUT=$(echo "$INPUT" | timeout 3s ./cseshell)
+INPUT=$(printf "ld \n\n\n notacommand_xyz \n ld \n exit \n")
+OUTPUT=$(echo "$INPUT" | timeout 3s ./macmini_shell)
 
 # ld should have run at least twice (once before and once after the bad command).
 COUNT=$(echo "$OUTPUT" | grep -c "files" || true)

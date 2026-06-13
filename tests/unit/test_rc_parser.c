@@ -1,11 +1,8 @@
 /*
  * tests/unit/test_rc_parser.c
  *
- * Unit tests for classify_rc_line, declared in source/rc_parser.h.
- *
- * These tests are written against the contract in rc_parser.h. They fail
- * with the stub implementation in source/rc_parser.c. Implement
- * classify_rc_line until they pass.
+ * Unit tests for classify_rc_line(), declared in includes/libs/rc_parser.h
+ * and implemented in src/01d_rc_parser.c.
  *
  * Run with:
  *   make unit

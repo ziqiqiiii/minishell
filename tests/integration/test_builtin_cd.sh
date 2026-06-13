@@ -3,10 +3,9 @@
 #
 # Verifies that `cd <dir>` changes the working directory inside the shell,
 # such that a subsequent `ld` shows the contents of the new directory.
-
 set -euo pipefail
 
-OUTPUT=$(printf "cd files\nld\nexit\n" | timeout 3s ./cseshell)
+OUTPUT=$(printf "cd files\nld\nexit\n" | timeout 3s ./macmini_shell)
 
 if ! echo "$OUTPUT" | grep -F "file1.txt" > /dev/null; then
   echo "FAIL: after 'cd files', expected ld to show file1.txt"

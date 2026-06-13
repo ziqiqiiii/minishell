@@ -132,8 +132,9 @@ $(LIBFT):
 SYS_NAME	:= system_programs
 SYS_SRC_DIR	:= ./src/$(SYS_NAME)
 BIN_DIR		:= ./bin
+PERMS_SRC	:= $(SYS_SRC_DIR)/perms.c
 
-SYS_SOURCES	:= $(wildcard $(SYS_SRC_DIR)/*.c)
+SYS_SOURCES	:= $(filter-out $(PERMS_SRC), $(wildcard $(SYS_SRC_DIR)/*.c))
 SYS_BINS	:= $(patsubst $(SYS_SRC_DIR)/%.c,$(BIN_DIR)/%,$(SYS_SOURCES))
 
 sys-header:
@@ -166,31 +167,58 @@ UNIT_BINS		:= $(UNIT_SOURCES:$(UNIT_DIR)/%.c=$(UNIT_BIN_DIR)/%)
 
 TEST_CFLAGS		:= -I./$(INC_DIR) -I./$(INC_DIR)/libs -I$(UNITY_DIR) -Wall -Wextra
 
+$(UNIT_BIN_DIR)/test_perms:     EXTRA_SRC := $(PERMS_SRC)
+$(UNIT_BIN_DIR)/test_rc_parser: EXTRA_SRC := ./src/01d_rc_parser.c
+
 $(UNIT_BIN_DIR)/test_%: $(UNIT_DIR)/test_%.c $(UNITY_DIR)/unity.c
 	@mkdir -p $(UNIT_BIN_DIR)
 	$(CC) $(TEST_CFLAGS) $^ $(EXTRA_SRC) -o $@
 
 unit: $(UNIT_BINS)
-	@echo "==> Running unit tests"
+	@echo "$(CYAN)==> Running unit tests$(CLR_RMV)"
 	@pass=0; fail=0; \
+	grn=$$(printf '\033[1;32m'); red=$$(printf '\033[1;31m'); rst=$$(printf '\033[0m'); cyn=$$(printf '\033[1;36m'); \
 	for t in $(UNIT_BINS); do \
-	  echo "--- $$t ---"; \
-	  if $$t; then pass=$$((pass+1)); else fail=$$((fail+1)); fi; \
+	  echo "$(YELLOW)--- $$t ---$(CLR_RMV)\n"; \
+	  output=$$($$t 2>&1); rc=$$?; \
+	  echo "$$output" | awk -v grn="$${grn}" -v red="$${red}" -v rst="$${rst}" -v cyn="$${cyn}" -F: ' \
+	    /^-{3,}/ || /^OK$$/ || /^FAIL$$/ { next } \
+	    NF >= 4 && $$4 == "PASS" { printf "  %-50s %sPASS%s\n", $$3, grn, rst; next } \
+	    NF >= 4 && $$4 == "FAIL" { printf "  %-50s %sFAIL%s\n", $$3, red, rst; next } \
+	    /^[0-9]/ { printf "\n%s  %s%s\n\n", cyn, $$0, rst } \
+	  '; \
+	  if [ $$rc -eq 0 ]; then pass=$$((pass+1)); else fail=$$((fail+1)); fi; \
 	done; \
 	echo ""; \
-	echo "Unit tests: $$pass passed, $$fail failed"; \
+	if [ $$fail -eq 0 ]; then \
+	  echo "$(GREEN)Unit tests: $$pass passed, $$fail failed$(CLR_RMV)"; \
+	else \
+	  echo "$(RED)Unit tests: $$pass passed, $$fail failed$(CLR_RMV)"; \
+	fi; \
 	test $$fail -eq 0
 
 integration: $(NAME) $(SYS_BINS)
-	@echo "==> Running integration tests"
-	@pass=0; fail=0; \
+	@echo "$(CYAN)==> Running integration tests$(CLR_RMV)"
+	@export ASAN_OPTIONS=detect_leaks=0; \
+	pass=0; fail=0; \
+	grn=$$(printf '\033[1;32m'); red=$$(printf '\033[1;31m'); rst=$$(printf '\033[0m'); cyn=$$(printf '\033[1;36m'); \
 	for s in $(INTEGRATION_DIR)/*.sh; do \
 	  [ -f "$$s" ] || continue; \
-	  echo "--- $$s ---"; \
-	  if bash $$s; then pass=$$((pass+1)); else fail=$$((fail+1)); fi; \
+	  echo "$(YELLOW)--- $$s ---$(CLR_RMV)"; \
+	  output=$$(bash $$s 2>&1); rc=$$?; \
+	  echo "$$output" | awk -v grn="$${grn}" -v red="$${red}" -v rst="$${rst}" -v cyn="$${cyn}" ' \
+	    /^PASS: / { printf "  %-55s %sPASS%s\n\n", substr($$0, 7), grn, rst; next } \
+	    /^FAIL: / { printf "  %-55s %sFAIL%s\n\n", substr($$0, 7), red, rst; next } \
+	    { print } \
+	  '; \
+	  if [ $$rc -eq 0 ]; then pass=$$((pass+1)); else fail=$$((fail+1)); fi; \
 	done; \
 	echo ""; \
-	echo "Integration tests: $$pass passed, $$fail failed"; \
+	if [ $$fail -eq 0 ]; then \
+	  echo "$(GREEN)Integration tests: $$pass passed, $$fail failed$(CLR_RMV)"; \
+	else \
+	  echo "$(RED)Integration tests: $$pass passed, $$fail failed$(CLR_RMV)"; \
+	fi; \
 	test $$fail -eq 0
 
 test: unit integration

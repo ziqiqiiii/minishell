@@ -1,12 +1,12 @@
 /*
  * tests/unit/test_perms.c
  *
- * this unit test directly test under libs/perms.c
+ * Unit tests for perms_to_string(), implemented in
+ * src/system_programs/perms.c and declared in includes/libs/perms.h.
  *
  * Run with:
  *   make unit
  */
-
 #include "unity.h"
 #include "perms.h"
 #include <string.h>

@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # setenv then env should show the new variable.
-OUTPUT=$(printf "setenv CSESHELL_TEST=hello\nenv\nexit\n" | timeout 3s ./cseshell)
+OUTPUT=$(printf "setenv CSESHELL_TEST=hello\nenv\nexit\n" | timeout 3s ./macmini_shell)
 if ! echo "$OUTPUT" | grep -F "CSESHELL_TEST=hello" > /dev/null; then
   echo "FAIL: setenv did not register CSESHELL_TEST=hello in env output"
   echo "----- shell output -----"
@@ -18,8 +18,8 @@ if ! echo "$OUTPUT" | grep -F "CSESHELL_TEST=hello" > /dev/null; then
 fi
 
 # setenv then unsetenv then env should NOT show the variable.
-OUTPUT=$(printf "setenv CSESHELL_TEST=hello\nunsetenv CSESHELL_TEST\nenv\nexit\n" | timeout 3s ./cseshell)
-if echo "$OUTPUT" | grep -F "CSESHELL_TEST=hello" > /dev/null; then
+OUTPUT=$(printf "setenv CSESHELL_TEST=hello \n unsetenv CSESHELL_TEST \n env \n exit \n" | timeout 3s ./macmini_shell)
+if echo "$OUTPUT" | grep -E "^CSESHELL_TEST=hello$" > /dev/null; then
   echo "FAIL: unsetenv did not remove CSESHELL_TEST"
   echo "----- shell output -----"
   echo "$OUTPUT"

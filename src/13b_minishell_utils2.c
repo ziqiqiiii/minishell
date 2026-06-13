@@ -54,6 +54,8 @@ void ft_kill(int pid)
  */
 int	ft_tcgetattr(int fd, struct termios *termios_p)
 {
+	if (!isatty(fd))
+		return (EXIT_SUCCESS);
 	if (tcgetattr(fd, termios_p) == -1)
 	{
 		perror("tcgetattr failed");
@@ -75,6 +77,8 @@ int	ft_tcgetattr(int fd, struct termios *termios_p)
  */
 int	ft_tcsetattr(int fd, int optional_actions, struct termios *termios_p)
 {
+	if (!isatty(fd))
+		return (EXIT_SUCCESS);
 	if (tcsetattr(fd, optional_actions, termios_p) == -1)
 	{
 		perror("tcsetattr failed");

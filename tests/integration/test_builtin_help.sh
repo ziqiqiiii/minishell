@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-OUTPUT=$(printf "help\nexit\n" | timeout 3s ./cseshell)
+OUTPUT=$(printf "help\nexit\n" | timeout 3s ./macmini_shell)
 
 MISSING=""
 for cmd in cd help exit usage env setenv unsetenv; do

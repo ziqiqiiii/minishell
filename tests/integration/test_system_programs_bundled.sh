@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-OUTPUT=$(printf "ld\nfind . file1\nldr\nexit\n" | timeout 5s ./cseshell)
+OUTPUT=$(printf "ld\nfind file1\nldr\nexit\n" | timeout 5s ./macmini_shell)
 
 # ld should list the 'files' directory.
 if ! echo "$OUTPUT" | grep -F "files" > /dev/null; then

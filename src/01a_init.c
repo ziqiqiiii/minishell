@@ -33,13 +33,16 @@ int	init_root(t_root *sh, char **envp)
 	sh->pipe = ft_calloc(2, sizeof(int));
 	if (!sh->pipe)
 		return (EXIT_FAILURE);
-	if (ft_tcgetattr(STDIN_FILENO, &sh->previous) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
-	if (ft_tcgetattr(STDIN_FILENO, &sh->current) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
-	sh->current.c_lflag &= ~ECHOCTL;
-	if (ft_tcsetattr(STDIN_FILENO, TCSANOW, &sh->current) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
+	if (isatty(STDIN_FILENO))
+	{
+		if (ft_tcgetattr(STDIN_FILENO, &sh->previous) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		if (ft_tcgetattr(STDIN_FILENO, &sh->current) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+		sh->current.c_lflag &= ~ECHOCTL;
+		if (ft_tcsetattr(STDIN_FILENO, TCSANOW, &sh->current) == EXIT_FAILURE)
+			return (EXIT_FAILURE);
+	}
 	sh->heredoc_flag = 0;
 	sh->exit_cmd_flag = 0;
 	return (EXIT_SUCCESS);

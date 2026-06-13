@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-if ! timeout 3s bash -c 'printf "exit\n" | ./cseshell' > /dev/null; then
+if ! timeout 3s bash -c 'printf "exit\n" | ./macmini_shell' > /dev/null; then
   echo "FAIL: shell did not exit cleanly within 3 seconds"
   exit 1
 fi

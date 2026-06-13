@@ -63,7 +63,9 @@ static void	exec_cmd(char *argv, char **envp, t_root *sh)
 		if (execve(path, cmd, envp) == -1)
 		{
 			ft_dup2(sh->stdout_tmp, STDOUT_FILENO);
-			printf("Error: Command not found: %s.\n", *cmd);
+			ft_putstr_fd("Error: Command not found: ", STDOUT_FILENO);
+			ft_putstr_fd(*cmd, STDOUT_FILENO);
+			ft_putstr_fd(".\n", STDOUT_FILENO);
 			_exit(EXIT_NO_CMD);
 		}
 	}
